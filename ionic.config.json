@@ -1,0 +1,7 @@
+{
+  "name": "court-pilot",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
