@@ -1,17 +1,99 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 2
-    </ion-title>
+    <ion-title> Játékvezetők </ion-title>
+    <ion-buttons [slot]="'end'">
+      <ion-button [color]="'primary'" [fill]="'solid'" id="open-modal">
+        <ion-icon slot="start" name="add"></ion-icon>
+        Hozzáadás
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
+      <ion-title size="large">Játékvezetők</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" sizeMd="6" pushMd="3">
+        <ion-list>
+          @for (umpire of umpires(); track umpire.id) {
+          <ion-item>
+            <ion-label> {{ umpire | fullname }} </ion-label>
+            <ion-button
+              [color]="'danger'"
+              slot="end"
+              (click)="showDeleteConfirmation(umpire)">
+              <ion-icon slot="icon-only" name="trash"></ion-icon>
+            </ion-button>
+          </ion-item>
+          } @empty {
+          <ion-item> Nincsenek játékvezetők </ion-item>
+          }
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-modal trigger="open-modal" (willDismiss)="onWillDismiss($event)">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button (click)="cancel()">Mégse</ion-button>
+          </ion-buttons>
+          <ion-title>Új játékvezető</ion-title>
+          <ion-buttons slot="end">
+            <ion-button
+              [disabled]="!isValidUmpire()"
+              (click)="confirm()"
+              [strong]="true">
+              Mentés
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-list>
+          <ion-item>
+            <ion-input
+              label="Vezetéknév"
+              labelPlacement="stacked"
+              type="text"
+              placeholder="Vezetéknév"
+              [(ngModel)]="lastName" />
+          </ion-item>
+          <ion-item>
+            <ion-input
+              label="Keresztnév"
+              labelPlacement="stacked"
+              type="text"
+              placeholder="Keresztnév"
+              [(ngModel)]="firstName" />
+          </ion-item>
+          <ion-item>
+            <ion-input
+              label="Ország"
+              labelPlacement="stacked"
+              type="text"
+              placeholder="Ország"
+              [(ngModel)]="country" />
+          </ion-item>
+          <ion-item>
+            <ion-select label="Nem" placeholder="Válassz" [(ngModel)]="gender">
+              @for (item of genders; track item.code) {
+              <ion-select-option [value]="item.code">
+                {{item.label}}
+              </ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
