@@ -1,5 +1,4 @@
 import Dexie, { type EntityTable } from 'dexie';
-import { settings } from 'ionicons/icons';
 
 export interface Umpire {
   id: number;
@@ -7,13 +6,19 @@ export interface Umpire {
   lastName: string;
   country: string;
   gender: string;
+  courtNo?: number;
 }
 
-export interface Court {
+export interface CourtUmpire {
   id: number;
   umpireId: number | null;
-  serviceJudgeId: number | null;
-  order: number;
+  courtNo: number;
+}
+
+export interface CourtServiceJudge {
+  id: number;
+  umpireId: number | null;
+  courtNo: number;
 }
 
 export interface WaitingAsUmpire {
@@ -36,7 +41,8 @@ export interface Settings {
 
 const db = new Dexie('CourtPilot') as Dexie & {
   umpires: EntityTable<Umpire, 'id'>;
-  courts: EntityTable<Court, 'id'>;
+  courtUmpires: EntityTable<CourtUmpire, 'id'>;
+  courtServiceJudges: EntityTable<CourtServiceJudge, 'id'>;
   settings: EntityTable<Settings, 'id'>;
   waitingUmpires: EntityTable<WaitingAsUmpire, 'id'>;
   waitingServiceJudges: EntityTable<WaitingAsServiceJudge, 'id'>;
@@ -44,7 +50,8 @@ const db = new Dexie('CourtPilot') as Dexie & {
 
 db.version(1).stores({
   umpires: '++id, lastName',
-  courts: '++id, umpireId, serviceJudgeId',
+  courtUmpires: '++id, courtNo, umpireId',
+  courtServiceJudges: '++id, courtNo, umpireId',
   settings: '++id',
   waitingUmpires: '++id, order, umpireId',
   waitingServiceJudges: '++id, order, serviceJudgeId'

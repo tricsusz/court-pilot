@@ -4,32 +4,72 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" cdkDropListGroup>
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Pályák</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <ion-grid [fixed]="'fixed'">
+  <ion-grid [fixed]="'fixed'" class="bottom-lists">
     <ion-row>
-      <ion-col [size]="1">Pálya</ion-col>
-      <ion-col>Játékvezető</ion-col>
-      <ion-col>Adogatásbíró</ion-col>
+      <ion-col [size]="1" class="ion-display-none ion-display-xl-block">
+        <ion-item [lines]="'none'">Pálya</ion-item>
+      </ion-col>
+      <ion-col [size]="1" class="ion-display-xl-none">
+        <ion-item [lines]="'none'">P</ion-item>
+      </ion-col>
+      <ion-col><ion-item [lines]="'none'">Játékvezető</ion-item></ion-col>
+      <ion-col><ion-item [lines]="'none'">Adogatásbíró</ion-item></ion-col>
     </ion-row>
     @for (item of [].constructor(settings()?.numberOfCourts); track $index) {
     <ion-row>
-      <ion-col [size]="1">{{ $index + 1 }}.</ion-col>
-      <ion-col>név1</ion-col>
-      <ion-col>név2</ion-col>
+      <ion-col [size]="1">
+        <ion-list>
+          <ion-item [lines]="'none'"> {{ $index + 1 }}. </ion-item>
+        </ion-list>
+      </ion-col>
+      <ion-col>
+        <ion-list
+          [lines]="'none'"
+          cdkDropList
+          [id]="`court-umpire-${$index + 1}`"
+          cdkDropListSortingDisabled
+          [cdkDropListData]="waitingServiceJudges()"
+          (cdkDropListDropped)="dropToUmpire($event, $index + 1)"
+          [cdkDropListConnectedTo]="['list-on-rest', 'list-waiting-umpires']">
+          @if (umpireByCourt().get($index + 1); as umpire) {
+
+          <ion-item cdkDrag [cdkDragData]="umpire">
+            <ion-label>{{ umpire | fullname }}</ion-label>
+          </ion-item>
+
+          }
+        </ion-list>
+      </ion-col>
+      <ion-col>
+        <ion-item [lines]="'none'"> aaa </ion-item>
+      </ion-col>
     </ion-row>
     }
   </ion-grid>
-  <ion-grid [fixed]="'fixed'" class="ion-margin-top">
+  <ion-grid [fixed]="'fixed'" class="ion-margin-top bottom-lists">
     <ion-row>
-      <ion-col [size]="4">Játékvezetők</ion-col>
-      <ion-col [size]="4">Adogatásbírók</ion-col>
-      <ion-col [size]="4">Pihenők</ion-col>
+      <ion-col [size]="4">
+        <ion-item color="primary">
+          <ion-label class="ion-text-center"> Játékvezetők </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col [size]="4">
+        <ion-item color="primary">
+          <ion-label class="ion-text-center"> Adogatásbírók </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col [size]="4">
+        <ion-item color="primary">
+          <ion-label class="ion-text-center"> Pihenők </ion-label>
+        </ion-item>
+      </ion-col>
     </ion-row>
     <ion-row>
       <ion-col>
@@ -38,18 +78,11 @@
           cdkDropList
           cdkDropListSortingDisabled
           id="list-waiting-umpires"
-          [cdkDropListData]="waitingUmpires"
-          (cdkDropListDropped)="dropToWaitingUmpire($event)"
-          [cdkDropListConnectedTo]="['list-on-rest', 'list-waiting-service-judges']">
-          @for (umpire of waitingUmpires; track umpire.id) {
+          [cdkDropListData]="waitingUmpires()"
+          (cdkDropListDropped)="dropToWaitingUmpire($event)">
+          @for (umpire of waitingUmpires(); track umpire.id) {
           <ion-item cdkDrag [cdkDragData]="umpire">
             <ion-label>{{ umpire|fullname }}</ion-label>
-          </ion-item>
-          } @empty {
-          <ion-item>
-            <ion-label class="ion-text-center">
-              <ion-icon [color]="'primary'" name="add"></ion-icon>
-            </ion-label>
           </ion-item>
           }
         </ion-list>
@@ -60,18 +93,11 @@
           cdkDropList
           cdkDropListSortingDisabled
           id="list-waiting-service-judges"
-          [cdkDropListData]="waitingServiceJudges"
-          (cdkDropListDropped)="dropToWaitingServiceJudge($event)"
-          [cdkDropListConnectedTo]="['list-on-rest', 'list-waiting-umpires']">
-          @for (umpire of waitingServiceJudges; track umpire.id) {
+          [cdkDropListData]="waitingServiceJudges()"
+          (cdkDropListDropped)="dropToWaitingServiceJudge($event)">
+          @for (umpire of waitingServiceJudges(); track umpire.id) {
           <ion-item cdkDrag [cdkDragData]="umpire">
             <ion-label>{{ umpire|fullname }}</ion-label>
-          </ion-item>
-          } @empty {
-          <ion-item>
-            <ion-label class="ion-text-center">
-              <ion-icon [color]="'primary'" name="add"></ion-icon>
-            </ion-label>
           </ion-item>
           }
         </ion-list>
@@ -83,9 +109,8 @@
           cdkDropListSortingDisabled
           id="list-on-rest"
           (cdkDropListDropped)="dropToRest($event)"
-          [cdkDropListData]="onRest"
-          [cdkDropListConnectedTo]="['list-waiting-service-judges', 'list-waiting-umpires']">
-          @for (umpire of onRest; track umpire.id) {
+          [cdkDropListData]="onRest()">
+          @for (umpire of onRest(); track umpire.id) {
           <ion-item cdkDrag [cdkDragData]="umpire">
             <ion-label>{{ umpire|fullname }}</ion-label>
           </ion-item>

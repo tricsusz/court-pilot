@@ -6,7 +6,10 @@ import { Umpire } from 'db';
   standalone: true
 })
 export class FullnamePipe implements PipeTransform {
-  transform(value: Umpire, ...args: unknown[]): string {
+  transform(value: Umpire | undefined, ...args: unknown[]): string {
+    if (typeof value === 'undefined') {
+      return '';
+    }
     // TODO: in case of multilang, change here
     return value.lastName + ' ' + value.firstName;
   }
