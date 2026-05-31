@@ -35,9 +35,8 @@
           cdkDropList
           [id]="`court-umpire-${$index + 1}`"
           cdkDropListSortingDisabled
-          [cdkDropListData]="waitingServiceJudges()"
-          (cdkDropListDropped)="dropToUmpire($event, $index + 1)"
-          [cdkDropListConnectedTo]="['list-on-rest', 'list-waiting-umpires']">
+          [cdkDropListData]="courtUmpires()"
+          (cdkDropListDropped)="dropToUmpire($event, $index + 1)">
           @if (umpireByCourt().get($index + 1); as umpire) {
 
           <ion-item cdkDrag [cdkDragData]="umpire">
@@ -48,7 +47,21 @@
         </ion-list>
       </ion-col>
       <ion-col>
-        <ion-item [lines]="'none'"> aaa </ion-item>
+        <ion-list
+          [lines]="'none'"
+          cdkDropList
+          [id]="`court-service-judge-${$index + 1}`"
+          cdkDropListSortingDisabled
+          [cdkDropListData]="courtServiceJudges()"
+          (cdkDropListDropped)="dropToServiceJudge($event, $index + 1)">
+          @if (serviceJudgeByCourt().get($index + 1); as umpire) {
+
+          <ion-item cdkDrag [cdkDragData]="umpire">
+            <ion-label>{{ umpire | fullname }}</ion-label>
+          </ion-item>
+
+          }
+        </ion-list>
       </ion-col>
     </ion-row>
     }

@@ -261,18 +261,7 @@ export class Tab1Page {
     } else {
       const comingFrom = event.previousContainer.id;
       const umpireToMove = event.item.data;
-      if ('list-waiting-service-judges' === comingFrom) {
-        // Remove from waiting service judges
-        this.waitingServiceJudgeService.removeByUmpireId(umpireToMove.id);
-      }
-
-      if ('list-waiting-umpires' === comingFrom) {
-        this.waitingUmpireService.removeByUmpireId(umpireToMove.id);
-      }
-
-      if (comingFrom.startsWith('court-umpire')) {
-        this.courtUmpireService.removeByUmpireId(umpireToMove.id);
-      }
+      this.removeFromOriginalPlace(umpireToMove, comingFrom);
     }
   }
 
@@ -284,13 +273,7 @@ export class Tab1Page {
       const umpireToMove = event.item.data;
       this.waitingServiceJudgeService.add(umpireToMove.id);
 
-      if ('list-waiting-umpires' === comingFrom) {
-        this.waitingUmpireService.removeByUmpireId(umpireToMove.id);
-      }
-
-      if (comingFrom.startsWith('court-umpire')) {
-        this.courtUmpireService.removeByUmpireId(umpireToMove.id);
-      }
+      this.removeFromOriginalPlace(umpireToMove, comingFrom);
     }
   }
 
@@ -308,14 +291,7 @@ export class Tab1Page {
       const umpireToMove = event.item.data;
       this.waitingUmpireService.add(umpireToMove.id);
 
-      if ('list-waiting-service-judges' === comingFrom) {
-        // Remove from waiting service judges
-        this.waitingServiceJudgeService.removeByUmpireId(umpireToMove.id);
-      }
-
-      if (comingFrom.startsWith('court-umpire')) {
-        this.courtUmpireService.removeByUmpireId(umpireToMove.id);
-      }
+      this.removeFromOriginalPlace(umpireToMove, comingFrom);
     }
   }
 
@@ -326,12 +302,37 @@ export class Tab1Page {
     const umpireToMove = event.item.data;
     this.courtUmpireService.save({ umpireId: umpireToMove.id, courtNo });
 
+    this.removeFromOriginalPlace(umpireToMove, comingFrom);
+  }
+
+  dropToServiceJudge(event: CdkDragDrop<Umpire[]>, courtNo: number) {
+    // TODO: stop dropping if there is already another umpire
+
+    const comingFrom = event.previousContainer.id;
+    const umpireToMove = event.item.data;
+    this.courtServiceJudgeService.save({ umpireId: umpireToMove.id, courtNo });
+
+    this.removeFromOriginalPlace(umpireToMove, comingFrom);
+  }
+
+  private removeFromOriginalPlace(
+    umpireToMove: Umpire,
+    comingFrom: string
+  ): void {
     if ('list-waiting-service-judges' === comingFrom) {
       this.waitingServiceJudgeService.removeByUmpireId(umpireToMove.id);
     }
 
     if ('list-waiting-umpires' === comingFrom) {
       this.waitingUmpireService.removeByUmpireId(umpireToMove.id);
+    }
+
+    if (comingFrom.startsWith('court-umpire')) {
+      this.courtUmpireService.removeByUmpireId(umpireToMove.id);
+    }
+
+    if (comingFrom.startsWith('court-service-judge')) {
+      this.courtServiceJudgeService.removeByUmpireId(umpireToMove.id);
     }
   }
 }

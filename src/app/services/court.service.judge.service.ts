@@ -45,4 +45,17 @@ export class CourtServiceJudgeService {
   async delete(id: number): Promise<void> {
     await db.courtServiceJudges.delete(id);
   }
+
+  async removeByUmpireId(umpireId: number): Promise<void> {
+    const item = await db.courtServiceJudges
+      .where('umpireId')
+      .equals(umpireId)
+      .first();
+
+    if (!item?.id) {
+      return;
+    }
+
+    await db.courtServiceJudges.delete(item.id);
+  }
 }
