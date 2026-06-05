@@ -19,8 +19,17 @@
       <ion-col [size]="1" class="ion-display-xl-none">
         <ion-item [lines]="'none'">P</ion-item>
       </ion-col>
-      <ion-col><ion-item [lines]="'none'">Játékvezető</ion-item></ion-col>
-      <ion-col><ion-item [lines]="'none'">Adogatásbíró</ion-item></ion-col>
+      <ion-col>
+        <ion-item [lines]="'none'">
+          <ion-label class="ion-text-center"> Játékvezető </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col>
+        <ion-item [lines]="'none'">
+          <ion-label class="ion-text-center"> Adogatásbíró </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="2" sizeLg="1"></ion-col>
     </ion-row>
     @for (item of [].constructor(settings()?.numberOfCourts); track $index) {
     <ion-row>
@@ -68,6 +77,21 @@
           }
         </ion-list>
       </ion-col>
+      <ion-col size="2" sizeLg="1">
+        <ion-list>
+          <ion-item lines="none">
+            <ion-button
+              [color]="'danger'"
+              [disabled]="!umpireByCourt().get($index + 1) || !serviceJudgeByCourt().get($index + 1)"
+              (click)="showRemoveConfirmation($index + 1)">
+              <ion-icon
+                slot="icon-only"
+                size="large"
+                name="exit-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ion-list>
+      </ion-col>
     </ion-row>
     }
   </ion-grid>
@@ -84,7 +108,7 @@
         </ion-item>
       </ion-col>
       <ion-col [size]="4">
-        <ion-item color="primary">
+        <ion-item color="medium">
           <ion-label class="ion-text-center"> Pihenők </ion-label>
         </ion-item>
       </ion-col>

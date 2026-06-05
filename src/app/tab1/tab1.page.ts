@@ -9,7 +9,10 @@ import {
   IonRow,
   IonList,
   IonItem,
-  IonLabel
+  IonLabel,
+  IonIcon,
+  IonButton,
+  AlertController
 } from '@ionic/angular/standalone';
 import { SettingsService } from '../services/settings-service';
 import { UmpireService } from '../services/umpire.service';
@@ -27,12 +30,17 @@ import {
 import { CommonModule } from '@angular/common';
 import { CourtUmpireService } from '../services/court.umpire.service';
 import { CourtServiceJudgeService } from '../services/court.service.judge.service';
+import { addIcons } from 'ionicons';
+import { exitOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
+  providers: [FullnamePipe],
   imports: [
+    IonButton,
+    IonIcon,
     IonLabel,
     IonItem,
     IonList,
@@ -52,12 +60,19 @@ import { CourtServiceJudgeService } from '../services/court.service.judge.servic
   ]
 })
 export class Tab1Page {
+  constructor() {
+    addIcons({ exitOutline });
+  }
+
   readonly settingsService = inject(SettingsService);
   readonly umpireService = inject(UmpireService);
   readonly waitingUmpireService = inject(WaitingUmpiresService);
   readonly waitingServiceJudgeService = inject(WaitingServiceJudgesService);
   readonly courtUmpireService = inject(CourtUmpireService);
   readonly courtServiceJudgeService = inject(CourtServiceJudgeService);
+
+  private alertController = inject(AlertController);
+  private fullnamePipe = inject(FullnamePipe);
 
   /**
    * Raw signals from services
@@ -358,4 +373,48 @@ export class Tab1Page {
   ): boolean => {
     return drop.data.length === 0;
   };
+
+  public async showRemoveConfirmation(courtNo: number) {
+    const umpire = this.umpireByCourt().get(courtNo);
+    const serviceJudge = this.serviceJudgeByCourt().get(courtNo);
+
+    if (typeof umpire === 'undefined' || typeof serviceJudge === 'undefined') {
+      return;
+    }
+
+    const alert = await this.alertController.create({
+      header: `Pálya ${courtNo}`,
+      subHeader: 'Biztos leveszed őket pályáról?',
+      message: `${this.fullnamePipe.transform(umpire)} - ${this.fullnamePipe.transform(serviceJudge)}`,
+      buttons: [
+        {
+          text: 'Nem',
+          role: 'cancel'
+        },
+        {
+          text: 'Igen',
+          role: 'confirm',
+          handler: () => {
+            this.removeUmpiresFromCourt(courtNo);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private async removeUmpiresFromCourt(courtNo: number) {
+    const umpire = this.umpireByCourt().get(courtNo);
+    const serviceJudge = this.serviceJudgeByCourt().get(courtNo);
+
+    if (typeof umpire === 'undefined' || typeof serviceJudge === 'undefined') {
+      return;
+    }
+
+    await this.courtUmpireService.removeByUmpireId(umpire.id);
+    await this.courtServiceJudgeService.removeByUmpireId(serviceJudge.id);
+    await this.waitingUmpireService.add(serviceJudge.id);
+    await this.waitingServiceJudgeService.add(umpire.id);
+  }
 }
