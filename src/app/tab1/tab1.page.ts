@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -9,20 +9,20 @@ import {
   IonRow,
   IonList,
   IonItem,
-  IonLabel,
-  IonIcon
+  IonLabel
 } from '@ionic/angular/standalone';
 import { SettingsService } from '../services/settings-service';
 import { UmpireService } from '../services/umpire.service';
-import { Umpire, WaitingAsServiceJudge, WaitingAsUmpire } from 'db';
+import { Umpire } from 'db';
 import { WaitingUmpiresService } from '../services/waiting-umpires.service';
 import { WaitingServiceJudgesService } from '../services/waiting-service-judges.service';
 import { FullnamePipe } from '../fullname-pipe';
 import {
   CdkDrag,
   CdkDragDrop,
+  CdkDragPlaceholder,
   CdkDropList,
-  DragDropModule
+  CdkDropListGroup
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { CourtUmpireService } from '../services/court.umpire.service';
@@ -47,7 +47,8 @@ import { CourtServiceJudgeService } from '../services/court.service.judge.servic
     CdkDropList,
     CdkDrag,
     CommonModule,
-    DragDropModule
+    CdkDragPlaceholder,
+    CdkDropListGroup
   ]
 })
 export class Tab1Page {
@@ -255,7 +256,6 @@ export class Tab1Page {
   });
 
   dropToRest(event: CdkDragDrop<Umpire[]>) {
-    console.log('drop to rest');
     if (event.previousContainer === event.container) {
       return;
     } else {
@@ -266,37 +266,46 @@ export class Tab1Page {
   }
 
   dropToWaitingServiceJudge(event: CdkDragDrop<Umpire[]>) {
+    const umpireToMove = event.item.data;
     if (event.previousContainer === event.container) {
-      // TODO
-    } else {
-      const comingFrom = event.previousContainer.id;
-      const umpireToMove = event.item.data;
-      this.waitingServiceJudgeService.add(umpireToMove.id);
-
-      this.removeFromOriginalPlace(umpireToMove, comingFrom);
+      this.waitingServiceJudgeService.moveToPosition(
+        umpireToMove.id,
+        event.currentIndex + 1
+      );
+      return;
     }
+    const comingFrom = event.previousContainer.id;
+
+    this.waitingServiceJudgeService.add(
+      umpireToMove.id,
+      event.currentIndex + 1
+    );
+
+    this.removeFromOriginalPlace(umpireToMove, comingFrom);
   }
 
   dropToWaitingUmpire(event: CdkDragDrop<Umpire[]>) {
-    console.log(
-      event.container.data,
-      event.previousContainer.data,
-      event.previousContainer.id,
-      event.container.id
-    );
+    const umpireToMove = event.item.data;
     if (event.previousContainer === event.container) {
-      // TODO
+      this.waitingUmpireService.moveToPosition(
+        umpireToMove.id,
+        event.currentIndex + 1
+      );
+      return;
     } else {
       const comingFrom = event.previousContainer.id;
-      const umpireToMove = event.item.data;
-      this.waitingUmpireService.add(umpireToMove.id);
+      this.waitingUmpireService.add(umpireToMove.id, event.currentIndex + 1);
 
       this.removeFromOriginalPlace(umpireToMove, comingFrom);
     }
   }
 
-  dropToUmpire(event: CdkDragDrop<Umpire[]>, courtNo: number) {
-    // TODO: stop dropping if there is already another umpire
+  dropToUmpire(event: CdkDragDrop<(Umpire | undefined)[]>, courtNo: number) {
+    const targetUmpires = event.container.data;
+
+    if (targetUmpires.length > 0) {
+      return;
+    }
 
     const comingFrom = event.previousContainer.id;
     const umpireToMove = event.item.data;
@@ -305,8 +314,15 @@ export class Tab1Page {
     this.removeFromOriginalPlace(umpireToMove, comingFrom);
   }
 
-  dropToServiceJudge(event: CdkDragDrop<Umpire[]>, courtNo: number) {
-    // TODO: stop dropping if there is already another umpire
+  dropToServiceJudge(
+    event: CdkDragDrop<(Umpire | undefined)[]>,
+    courtNo: number
+  ) {
+    const targetUmpires = event.container.data;
+
+    if (targetUmpires.length > 0) {
+      return;
+    }
 
     const comingFrom = event.previousContainer.id;
     const umpireToMove = event.item.data;
@@ -335,4 +351,11 @@ export class Tab1Page {
       this.courtServiceJudgeService.removeByUmpireId(umpireToMove.id);
     }
   }
+
+  canDropUmpire = (
+    drag: CdkDrag<Umpire>,
+    drop: CdkDropList<Umpire[]>
+  ): boolean => {
+    return drop.data.length === 0;
+  };
 }

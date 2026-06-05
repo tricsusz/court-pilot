@@ -1,3 +1,12 @@
 .bottom-lists ion-list {
     min-height: 64px;
 }
+
+.custom-ion-item {
+    cursor: move;
+    padding: 10px 15px;
+
+    &.primary {
+        background-color: var(--ion-color-primary);
+    }
+}
