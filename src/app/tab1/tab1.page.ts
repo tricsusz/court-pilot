@@ -385,6 +385,7 @@ export class Tab1Page {
     const alert = await this.alertController.create({
       header: `Pálya ${courtNo}`,
       subHeader: 'Biztos leveszed őket pályáról?',
+      cssClass: 'wide',
       message: `${this.fullnamePipe.transform(umpire)} - ${this.fullnamePipe.transform(serviceJudge)}`,
       buttons: [
         {

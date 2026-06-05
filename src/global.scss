@@ -35,3 +35,13 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+.wide.sc-ion-alert-md-h {
+    .sc-ion-alert-md {
+        --backdrop-opacity: 0.8;
+    }
+
+    &.sc-ion-alert-md-h {
+        --min-width: 400px;
+    }    
+}
