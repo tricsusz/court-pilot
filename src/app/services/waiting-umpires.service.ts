@@ -152,4 +152,10 @@ export class WaitingUmpiresService {
       }
     });
   }
+
+  async getCurrentUmpire(): Promise<Umpire | undefined> {
+    const item = await db.waitingUmpires.where('order').equals(1).first();
+
+    return item ? db.umpires.get(item.umpireId) : undefined;
+  }
 }

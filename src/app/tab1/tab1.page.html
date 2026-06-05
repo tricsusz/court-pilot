@@ -80,15 +80,29 @@
       <ion-col size="2" sizeLg="1">
         <ion-list>
           <ion-item lines="none">
+            @if (umpireByCourt().get($index + 1) &&
+            serviceJudgeByCourt().get($index + 1)) {
             <ion-button
               [color]="'danger'"
-              [disabled]="!umpireByCourt().get($index + 1) || !serviceJudgeByCourt().get($index + 1)"
               (click)="showRemoveConfirmation($index + 1)">
               <ion-icon
                 slot="icon-only"
                 size="large"
                 name="exit-outline"></ion-icon>
             </ion-button>
+            } @else if (!umpireByCourt().get($index + 1) &&
+            !serviceJudgeByCourt().get($index + 1) && waitingUmpires().length &&
+            waitingServiceJudges().length) {
+            <ion-button
+              [color]="'success'"
+              [disabled]=""
+              (click)="showAddConfirmation($index + 1)">
+              <ion-icon
+                slot="icon-only"
+                size="large"
+                name="enter-outline"></ion-icon>
+            </ion-button>
+            }
           </ion-item>
         </ion-list>
       </ion-col>

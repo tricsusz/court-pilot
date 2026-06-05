@@ -31,7 +31,7 @@ import { CommonModule } from '@angular/common';
 import { CourtUmpireService } from '../services/court.umpire.service';
 import { CourtServiceJudgeService } from '../services/court.service.judge.service';
 import { addIcons } from 'ionicons';
-import { exitOutline } from 'ionicons/icons';
+import { enterOutline, exitOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tab1',
@@ -61,7 +61,7 @@ import { exitOutline } from 'ionicons/icons';
 })
 export class Tab1Page {
   constructor() {
-    addIcons({ exitOutline });
+    addIcons({ exitOutline, enterOutline });
   }
 
   readonly settingsService = inject(SettingsService);
@@ -416,5 +416,52 @@ export class Tab1Page {
     await this.courtServiceJudgeService.removeByUmpireId(serviceJudge.id);
     await this.waitingUmpireService.add(serviceJudge.id);
     await this.waitingServiceJudgeService.add(umpire.id);
+  }
+
+  public async showAddConfirmation(courtNo: number) {
+    const umpire = await this.waitingUmpireService.getCurrentUmpire();
+    const serviceJudge =
+      await this.waitingServiceJudgeService.getCurrentUmpire();
+
+    if (typeof umpire === 'undefined' || typeof serviceJudge === 'undefined') {
+      return;
+    }
+
+    const alert = await this.alertController.create({
+      header: `Pálya ${courtNo}`,
+      cssClass: 'wide',
+      subHeader: 'Biztos pályára küldöd őket?',
+      message: `${this.fullnamePipe.transform(umpire)} - ${this.fullnamePipe.transform(serviceJudge)}`,
+      buttons: [
+        {
+          text: 'Nem',
+          role: 'cancel'
+        },
+        {
+          text: 'Igen',
+          role: 'confirm',
+          handler: () => {
+            this.addUmpiresToCourt(courtNo, umpire, serviceJudge);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private async addUmpiresToCourt(
+    courtNo: number,
+    umpire: Umpire,
+    serviceJudge: Umpire
+  ) {
+    await this.courtUmpireService.save({ courtNo, umpireId: umpire.id });
+    await this.courtServiceJudgeService.save({
+      courtNo,
+      umpireId: serviceJudge.id
+    });
+
+    await this.waitingUmpireService.removeByUmpireId(umpire.id);
+    await this.waitingServiceJudgeService.removeByUmpireId(serviceJudge.id);
   }
 }
