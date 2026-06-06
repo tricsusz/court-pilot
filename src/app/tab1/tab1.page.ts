@@ -382,6 +382,11 @@ export class Tab1Page {
       return;
     }
 
+    if (!this.settings()?.showAlert) {
+      this.removeUmpiresFromCourt(courtNo);
+      return;
+    }
+
     const alert = await this.alertController.create({
       header: `Pálya ${courtNo}`,
       subHeader: 'Biztos leveszed őket pályáról?',
@@ -425,6 +430,11 @@ export class Tab1Page {
       await this.waitingServiceJudgeService.getCurrentUmpire();
 
     if (typeof umpire === 'undefined' || typeof serviceJudge === 'undefined') {
+      return;
+    }
+
+    if (!this.settings()?.showAlert) {
+      this.addUmpiresToCourt(courtNo, umpire, serviceJudge);
       return;
     }
 
