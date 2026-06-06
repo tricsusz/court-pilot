@@ -1,17 +1,46 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>
-      Tab 3
-    </ion-title>
+    <ion-title>Beállítások</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <ion-grid [fixed]="true">
+    <ion-row>
+      <ion-col sizeLg="6" pushLg="3">
+        @if (settings(); as currentSettings) {
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+        <ion-list>
+          <ion-item>
+            <ion-toggle
+              [checked]="currentSettings.withServiceJudge"
+              (ionChange)="updateWithServiceJudge($event)">
+              Adogatásbíró
+            </ion-toggle>
+          </ion-item>
+
+          <ion-item>
+            <ion-toggle
+              [checked]="currentSettings.showAlert"
+              (ionChange)="updateShowAlert($event)">
+              Figyelmeztetések megjelenítése a gyors gomboknál
+            </ion-toggle>
+          </ion-item>
+
+          <ion-item>
+            <ion-input
+              label="Pályák száma"
+              type="number"
+              min="1"
+              labelPlacement="floating"
+              [value]="currentSettings.numberOfCourts"
+              (ionInput)="updateNumberOfCourts($event)">
+            </ion-input>
+          </ion-item>
+        </ion-list>
+
+        }
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

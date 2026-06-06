@@ -39,7 +39,8 @@ export class SettingsService {
       await db.settings.put({
         id: 1,
         numberOfCourts: 5,
-        withServiceJudge: true
+        withServiceJudge: true,
+        showAlert: true
       });
     }
   }

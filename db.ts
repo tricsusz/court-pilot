@@ -37,6 +37,7 @@ export interface Settings {
   id: number;
   withServiceJudge: boolean;
   numberOfCourts: number;
+  showAlert: boolean;
 }
 
 const db = new Dexie('CourtPilot') as Dexie & {
