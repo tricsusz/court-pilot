@@ -270,6 +270,13 @@ export class Tab1Page {
     return Array.from({ length: count }, (_, i) => i + 1);
   });
 
+  /**
+   * Is service judge functionality enabled in settings.
+   */
+  readonly serviceJudgeEnabled = computed(() => {
+    return this.settings()?.withServiceJudge ?? false;
+  });
+
   dropToRest(event: CdkDragDrop<Umpire[]>) {
     if (event.previousContainer === event.container) {
       return;
@@ -378,7 +385,10 @@ export class Tab1Page {
     const umpire = this.umpireByCourt().get(courtNo);
     const serviceJudge = this.serviceJudgeByCourt().get(courtNo);
 
-    if (typeof umpire === 'undefined' || typeof serviceJudge === 'undefined') {
+    if (
+      typeof umpire === 'undefined' ||
+      (typeof serviceJudge === 'undefined' && this.serviceJudgeEnabled())
+    ) {
       return;
     }
 
@@ -389,9 +399,9 @@ export class Tab1Page {
 
     const alert = await this.alertController.create({
       header: `Pálya ${courtNo}`,
-      subHeader: 'Biztos leveszed őket pályáról?',
+      subHeader: `Biztos leveszed ${serviceJudge ? 'őket' : 'őt'} a pályáról?`,
       cssClass: 'wide',
-      message: `${this.fullnamePipe.transform(umpire)} - ${this.fullnamePipe.transform(serviceJudge)}`,
+      message: `${this.fullnamePipe.transform(umpire)} ${serviceJudge ? '- ' : ''} ${this.fullnamePipe.transform(serviceJudge)}`,
       buttons: [
         {
           text: 'Nem',
@@ -401,7 +411,12 @@ export class Tab1Page {
           text: 'Igen',
           role: 'confirm',
           handler: () => {
-            this.removeUmpiresFromCourt(courtNo);
+            if (this.serviceJudgeEnabled()) {
+              this.removeUmpiresFromCourt(courtNo);
+              return;
+            }
+
+            this.removeUmpireFromCourt(courtNo);
           }
         }
       ]
@@ -410,6 +425,9 @@ export class Tab1Page {
     await alert.present();
   }
 
+  /**
+   * This is for removing both umpire and service judge from the court (when service judge is enabled).
+   */
   private async removeUmpiresFromCourt(courtNo: number) {
     const umpire = this.umpireByCourt().get(courtNo);
     const serviceJudge = this.serviceJudgeByCourt().get(courtNo);
@@ -424,25 +442,46 @@ export class Tab1Page {
     await this.waitingServiceJudgeService.add(umpire.id);
   }
 
+  /**
+   * This is for removing 1 umpire only (when service judge is not enabled).
+   */
+  private async removeUmpireFromCourt(courtNo: number) {
+    const umpire = this.umpireByCourt().get(courtNo);
+
+    if (typeof umpire === 'undefined') {
+      return;
+    }
+
+    await this.courtUmpireService.removeByUmpireId(umpire.id);
+    await this.waitingUmpireService.add(umpire.id);
+  }
+
   public async showAddConfirmation(courtNo: number) {
     const umpire = await this.waitingUmpireService.getCurrentUmpire();
     const serviceJudge =
       await this.waitingServiceJudgeService.getCurrentUmpire();
 
-    if (typeof umpire === 'undefined' || typeof serviceJudge === 'undefined') {
+    if (
+      typeof umpire === 'undefined' ||
+      (typeof serviceJudge === 'undefined' && this.serviceJudgeEnabled())
+    ) {
       return;
     }
 
     if (!this.settings()?.showAlert) {
-      this.addUmpiresToCourt(courtNo, umpire, serviceJudge);
+      if (this.serviceJudgeEnabled() && serviceJudge) {
+        this.addUmpiresToCourt(courtNo, umpire, serviceJudge);
+        return;
+      }
+      this.addUmpireToCourt(courtNo, umpire);
       return;
     }
 
     const alert = await this.alertController.create({
       header: `Pálya ${courtNo}`,
       cssClass: 'wide',
-      subHeader: 'Biztos pályára küldöd őket?',
-      message: `${this.fullnamePipe.transform(umpire)} - ${this.fullnamePipe.transform(serviceJudge)}`,
+      subHeader: `Biztos pályára küldöd ${serviceJudge ? 'őket' : 'őt'}?`,
+      message: `${this.fullnamePipe.transform(umpire)} ${serviceJudge ? ' - ' : ''} ${this.fullnamePipe.transform(serviceJudge)}`,
       buttons: [
         {
           text: 'Nem',
@@ -452,7 +491,11 @@ export class Tab1Page {
           text: 'Igen',
           role: 'confirm',
           handler: () => {
-            this.addUmpiresToCourt(courtNo, umpire, serviceJudge);
+            if (this.serviceJudgeEnabled() && serviceJudge) {
+              this.addUmpiresToCourt(courtNo, umpire, serviceJudge);
+            } else {
+              this.addUmpireToCourt(courtNo, umpire);
+            }
           }
         }
       ]
@@ -474,5 +517,10 @@ export class Tab1Page {
 
     await this.waitingUmpireService.removeByUmpireId(umpire.id);
     await this.waitingServiceJudgeService.removeByUmpireId(serviceJudge.id);
+  }
+
+  private async addUmpireToCourt(courtNo: number, umpire: Umpire) {
+    await this.courtUmpireService.save({ courtNo, umpireId: umpire.id });
+    await this.waitingUmpireService.removeByUmpireId(umpire.id);
   }
 }
