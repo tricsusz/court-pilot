@@ -1,10 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title> Játékvezetők </ion-title>
+    <ion-title> {{ 'courtOfficials' | translate }} </ion-title>
     <ion-buttons [slot]="'end'">
       <ion-button [color]="'primary'" [fill]="'solid'" id="open-modal">
         <ion-icon slot="start" name="add"></ion-icon>
-        Hozzáadás
+        {{ 'add' | translate }}
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -32,7 +32,7 @@
             </ion-button>
           </ion-item>
           } @empty {
-          <ion-item> Nincsenek játékvezetők </ion-item>
+          <ion-item> {{ 'noCourtOfficials' | translate }} </ion-item>
           }
         </ion-list>
       </ion-col>
@@ -44,15 +44,17 @@
       <ion-header>
         <ion-toolbar>
           <ion-buttons slot="start">
-            <ion-button (click)="cancel()">Mégse</ion-button>
+            <ion-button (click)="cancel()"
+              >{{ 'cancel' | translate }}</ion-button
+            >
           </ion-buttons>
-          <ion-title>Új játékvezető</ion-title>
+          <ion-title>{{ 'newCourtOfficial' | translate }}</ion-title>
           <ion-buttons slot="end">
             <ion-button
               [disabled]="!isValidUmpire()"
               (click)="confirm()"
               [strong]="true">
-              Mentés
+              {{ 'save' | translate }}
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
@@ -61,33 +63,36 @@
         <ion-list>
           <ion-item>
             <ion-input
-              label="Vezetéknév"
+              [label]="'lastName' | translate"
               labelPlacement="stacked"
               type="text"
-              placeholder="Vezetéknév"
+              placeholder="{{ 'lastName' | translate }}"
               [(ngModel)]="lastName" />
           </ion-item>
           <ion-item>
             <ion-input
-              label="Keresztnév"
+              [label]="'firstName' | translate"
               labelPlacement="stacked"
               type="text"
-              placeholder="Keresztnév"
+              placeholder="{{ 'firstName' | translate }}"
               [(ngModel)]="firstName" />
           </ion-item>
           <ion-item>
             <ion-input
-              label="Ország"
+              [label]="'country' | translate"
               labelPlacement="stacked"
               type="text"
-              placeholder="Ország"
+              placeholder="{{ 'country' | translate }}"
               [(ngModel)]="country" />
           </ion-item>
           <ion-item>
-            <ion-select label="Nem" placeholder="Válassz" [(ngModel)]="gender">
+            <ion-select
+              [label]="'gender' | translate"
+              placeholder="{{ 'gender' | translate }}"
+              [(ngModel)]="gender">
               @for (item of genders; track item.code) {
               <ion-select-option [value]="item.code">
-                {{item.label}}
+                {{item.label | translate }}
               </ion-select-option>
               }
             </ion-select>

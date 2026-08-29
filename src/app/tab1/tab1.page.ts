@@ -32,6 +32,8 @@ import { CourtUmpireService } from '../services/court.umpire.service';
 import { CourtServiceJudgeService } from '../services/court.service.judge.service';
 import { addIcons } from 'ionicons';
 import { enterOutline, exitOutline } from 'ionicons/icons';
+import { TranslatePipe } from '../i18n/translation.pipe';
+import { TranslationService } from '../i18n/translation.service';
 
 @Component({
   selector: 'app-tab1',
@@ -56,7 +58,8 @@ import { enterOutline, exitOutline } from 'ionicons/icons';
     CdkDrag,
     CommonModule,
     CdkDragPlaceholder,
-    CdkDropListGroup
+    CdkDropListGroup,
+    TranslatePipe
   ]
 })
 export class Tab1Page {
@@ -70,6 +73,7 @@ export class Tab1Page {
   readonly waitingServiceJudgeService = inject(WaitingServiceJudgesService);
   readonly courtUmpireService = inject(CourtUmpireService);
   readonly courtServiceJudgeService = inject(CourtServiceJudgeService);
+  readonly translationService = inject(TranslationService);
 
   private alertController = inject(AlertController);
   private fullnamePipe = inject(FullnamePipe);
@@ -398,17 +402,27 @@ export class Tab1Page {
     }
 
     const alert = await this.alertController.create({
-      header: `Pálya ${courtNo}`,
-      subHeader: `Biztos leveszed ${serviceJudge ? 'őket' : 'őt'} a pályáról?`,
+      header: this.translationService.translate('courtConfirm', {
+        courtNo
+      }),
+
+      subHeader: this.translationService.translate(
+        serviceJudge ? 'removeUmpiresFromCourt' : 'removeUmpireFromCourt'
+      ),
+
       cssClass: 'wide',
-      message: `${this.fullnamePipe.transform(umpire)} ${serviceJudge ? '- ' : ''} ${this.fullnamePipe.transform(serviceJudge)}`,
+
+      message: `${this.fullnamePipe.transform(umpire)}${
+        serviceJudge ? ' - ' : ''
+      }${this.fullnamePipe.transform(serviceJudge)}`,
+
       buttons: [
         {
-          text: 'Nem',
+          text: this.translationService.translate('no'),
           role: 'cancel'
         },
         {
-          text: 'Igen',
+          text: this.translationService.translate('yes'),
           role: 'confirm',
           handler: () => {
             if (this.serviceJudgeEnabled()) {
@@ -478,17 +492,31 @@ export class Tab1Page {
     }
 
     const alert = await this.alertController.create({
-      header: `Pálya ${courtNo}`,
+      header: this.translationService.translate('court', {
+        courtNo
+      }),
+
       cssClass: 'wide',
-      subHeader: `Biztos pályára küldöd ${serviceJudge ? 'őket' : 'őt'}?`,
-      message: `${this.fullnamePipe.transform(umpire)} ${serviceJudge ? ' - ' : ''} ${this.fullnamePipe.transform(serviceJudge)}`,
+
+      subHeader: this.translationService.translate(
+        serviceJudge ? 'sendUmpiresToCourt' : 'sendUmpireToCourt'
+      ),
+
+      message: this.translationService.translate(
+        serviceJudge ? 'sendUmpiresMessage' : 'sendUmpireMessage',
+        {
+          umpire: this.fullnamePipe.transform(umpire),
+          serviceJudge: this.fullnamePipe.transform(serviceJudge)
+        }
+      ),
+
       buttons: [
         {
-          text: 'Nem',
+          text: this.translationService.translate('no'),
           role: 'cancel'
         },
         {
-          text: 'Igen',
+          text: this.translationService.translate('yes'),
           role: 'confirm',
           handler: () => {
             if (this.serviceJudgeEnabled() && serviceJudge) {

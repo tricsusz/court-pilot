@@ -10,13 +10,18 @@ import {
   IonInput,
   IonGrid,
   IonCol,
-  IonRow
+  IonRow,
+  IonSelect,
+  IonSelectOption
 } from '@ionic/angular/standalone';
 import { SettingsService } from '../services/settings-service';
 import { CourtUmpireService } from '../services/court.umpire.service';
 import { CourtServiceJudgeService } from '../services/court.service.judge.service';
 import { CourtServiceJudge } from 'db';
 import { WaitingServiceJudgesService } from '../services/waiting-service-judges.service';
+import { TranslationService } from '../i18n/translation.service';
+import { Language } from '../i18n/translations';
+import { TranslatePipe } from '../i18n/translation.pipe';
 
 @Component({
   selector: 'app-tab3',
@@ -33,7 +38,10 @@ import { WaitingServiceJudgesService } from '../services/waiting-service-judges.
     IonHeader,
     IonToolbar,
     IonTitle,
-    IonContent
+    IonContent,
+    IonSelect,
+    IonSelectOption,
+    TranslatePipe
   ]
 })
 export class Tab3Page {
@@ -41,6 +49,7 @@ export class Tab3Page {
   readonly courtUmpireService = inject(CourtUmpireService);
   readonly courtServiceJudgeService = inject(CourtServiceJudgeService);
   readonly waitingServiceJudgeService = inject(WaitingServiceJudgesService);
+  readonly translationService = inject(TranslationService);
 
   readonly settings = this.settingsService.settings;
 
@@ -78,7 +87,6 @@ export class Tab3Page {
         this.courtServiceJudgeService.delete(csj.id);
       });
 
-
       this.waitingServiceJudgeService.waitingServiceJudges().map((wsj) => {
         this.waitingServiceJudgeService.remove(wsj.id);
       });
@@ -89,5 +97,9 @@ export class Tab3Page {
     await this.settingsService.update({
       showAlert: event.detail.checked
     });
+  }
+
+  updateLanguage(event: CustomEvent): void {
+    this.translationService.setLanguage(event.detail.value as Language);
   }
 }

@@ -1,33 +1,33 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title> Pályák </ion-title>
+    <ion-title> {{ 'courts' | translate }} </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" cdkDropListGroup>
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Pályák</ion-title>
+      <ion-title size="large">{{ 'courts' | translate }}</ion-title>
     </ion-toolbar>
   </ion-header>
 
   <ion-grid [fixed]="'fixed'" class="bottom-lists">
     <ion-row>
       <ion-col [size]="1" class="ion-display-none ion-display-xl-block">
-        <ion-item [lines]="'none'">Pálya</ion-item>
+        <ion-item [lines]="'none'">{{ 'court' | translate }}</ion-item>
       </ion-col>
       <ion-col [size]="1" class="ion-display-xl-none">
-        <ion-item [lines]="'none'">P</ion-item>
+        <ion-item [lines]="'none'">{{ 'shortCourtName' | translate }}</ion-item>
       </ion-col>
       <ion-col>
         <ion-item [lines]="'none'">
-          <ion-label class="ion-text-center"> Játékvezető </ion-label>
+          <ion-label class="ion-text-center"> {{ 'umpire' | translate }} </ion-label>
         </ion-item>
       </ion-col>
       @if (serviceJudgeEnabled()) {
       <ion-col>
         <ion-item [lines]="'none'">
-          <ion-label class="ion-text-center"> Adogatásbíró </ion-label>
+          <ion-label class="ion-text-center"> {{ 'serviceJudge' | translate }} </ion-label>
         </ion-item>
       </ion-col>
       }
@@ -119,19 +119,19 @@
     <ion-row>
       <ion-col [size]="!serviceJudgeEnabled() ? 6 : 4">
         <ion-item color="primary">
-          <ion-label class="ion-text-center"> Játékvezetők </ion-label>
+          <ion-label class="ion-text-center"> {{ 'umpires' | translate }} </ion-label>
         </ion-item>
       </ion-col>
       @if (serviceJudgeEnabled()) {
       <ion-col [size]="4">
         <ion-item color="primary">
-          <ion-label class="ion-text-center"> Adogatásbírók </ion-label>
+          <ion-label class="ion-text-center"> {{ 'serviceJudges' | translate }} </ion-label>
         </ion-item>
       </ion-col>
       }
       <ion-col [size]="!serviceJudgeEnabled() ? 6 : 4">
         <ion-item color="medium">
-          <ion-label class="ion-text-center"> Pihenők </ion-label>
+          <ion-label class="ion-text-center"> {{ 'notOnDuty' | translate }} </ion-label>
         </ion-item>
       </ion-col>
     </ion-row>

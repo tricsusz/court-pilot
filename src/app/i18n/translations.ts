@@ -1,0 +1,86 @@
+import { language, male, settings } from 'ionicons/icons';
+import { noop } from 'rxjs';
+
+export const translations = {
+  en: {
+    courts: 'Courts',
+    numberOfCourts: 'Number of Courts',
+    showAlerts: 'Show alerts on quick buttons',
+    serviceJudge: 'Service Judge',
+    language: 'Language',
+    settings: 'Settings',
+    courtOfficials: 'Court Officials',
+    add: 'Add',
+    noCourtOfficials: 'No court officials',
+    newCourtOfficial: 'New Court Official',
+    cancel: 'Cancel',
+    save: 'Save',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    country: 'Country',
+    gender: 'Gender',
+    male: 'Male',
+    female: 'Female',
+    confirmation: 'Confirmation',
+    confirmDeleteUmpire: 'Do you really want to delete this court official?',
+    no: 'No',
+    yes: 'Yes',
+    umpires: 'Umpires',
+    serviceJudges: 'Service Judges',
+    notOnDuty: 'Not on Duty',
+    shortCourtName: 'C',
+    court: 'Court',
+    umpire: 'Umpire',
+    removeUmpireFromCourt:
+      'Are you sure you want to remove them from the court?',
+    removeUmpiresFromCourt:
+      'Are you sure you want to remove them from the court?',
+    courtConfirm: 'Court {courtNo}',
+    sendUmpireToCourt: 'Are you sure you want to send them to the court?',
+    sendUmpiresToCourt: 'Are you sure you want to send them to the court?',
+    sendUmpireMessage: '{umpire}',
+    sendUmpiresMessage: '{umpire} - {serviceJudge}'
+  },
+
+  hu: {
+    courts: 'Pályák',
+    numberOfCourts: 'Pályák száma',
+    showAlerts: 'Figyelmeztetések megjelenítése a gyors gomboknál',
+    serviceJudge: 'Adogatásbíró',
+    language: 'Nyelv',
+    settings: 'Beállítások',
+    courtOfficials: 'Tisztségviselők',
+    add: 'Hozzáadás',
+    noCourtOfficials: 'Nincsenek tisztségviselők',
+    newCourtOfficial: 'Új Tisztségviselő',
+    cancel: 'Mégse',
+    save: 'Mentés',
+    firstName: 'Keresztnév',
+    lastName: 'Vezetéknév',
+    country: 'Ország',
+    gender: 'Nem',
+    male: 'Férfi',
+    female: 'Nő',
+    confirmation: 'Megerősítés',
+    confirmDeleteUmpire: 'Biztosan törölni szeretnéd ezt a tisztségviselőt?',
+    no: 'Nem',
+    yes: 'Igen',
+    umpires: 'Játékeveztők',
+    serviceJudges: 'Adogatásbírók',
+    notOnDuty: 'Pihenő',
+    shortCourtName: 'P',
+    court: 'Pálya',
+    umpire: 'Játékeveztő',
+    removeUmpireFromCourt: 'Biztos leveszed őt a pályáról?',
+    removeUmpiresFromCourt: 'Biztos leveszed őket a pályáról?',
+    courtConfirm: 'Pálya {courtNo}',
+    sendUmpireToCourt: 'Biztos pályára küldöd őt?',
+    sendUmpiresToCourt: 'Biztos pályára küldöd őket?',
+    sendUmpireMessage: '{umpire}',
+    sendUmpiresMessage: '{umpire} - {serviceJudge}'
+  }
+} as const;
+
+export type Language = keyof typeof translations;
+export type TranslationKey = keyof typeof translations.en;
+export type TranslationParams = Record<string, string | number>;

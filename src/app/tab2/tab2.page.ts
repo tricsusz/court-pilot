@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -26,6 +26,9 @@ import { add, trash } from 'ionicons/icons';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { FormsModule } from '@angular/forms';
 import { FullnamePipe } from '../fullname-pipe';
+import { TranslatePipe } from '../i18n/translation.pipe';
+import { TranslationKey } from '../i18n/translations';
+import { TranslationService } from '../i18n/translation.service';
 
 @Component({
   selector: 'app-tab2',
@@ -51,11 +54,18 @@ import { FullnamePipe } from '../fullname-pipe';
     IonSelect,
     IonSelectOption,
     IonList,
-    FullnamePipe
+    FullnamePipe,
+    TranslatePipe
   ]
 })
 export class Tab2Page {
+  readonly translationService = inject(TranslationService);
+
   @ViewChild(IonModal) modal!: IonModal;
+
+  public readonly umpireService = inject(UmpireService);
+  public readonly fullnamePipe = inject(FullnamePipe);
+  public readonly alertController = inject(AlertController);
 
   public readonly umpires = this.umpireService.umpires;
 
@@ -64,16 +74,12 @@ export class Tab2Page {
   public country: string = '';
   public gender: string = '';
 
-  public genders = [
-    { label: 'gender.male', code: 'M' },
-    { label: 'gender.female', code: 'W' }
+  public genders: { label: TranslationKey; code: string }[] = [
+    { label: 'male', code: 'M' },
+    { label: 'female', code: 'W' }
   ];
 
-  constructor(
-    private umpireService: UmpireService,
-    private alertController: AlertController,
-    private fullnamePipe: FullnamePipe
-  ) {
+  constructor() {
     addIcons({ add, trash });
   }
 
@@ -112,18 +118,18 @@ export class Tab2Page {
     return this.lastName !== '' && this.firstName !== '';
   }
 
-  public async showDeleteConfirmation(umpire: Umpire) {
+  public async showDeleteConfirmation(umpire: Umpire): Promise<void> {
     const alert = await this.alertController.create({
-      header: 'Megerősítés',
-      subHeader: 'Biztos törlöd a következő játékvezetőt?',
+      header: this.translationService.translate('confirmation'),
+      subHeader: this.translationService.translate('confirmDeleteUmpire'),
       message: this.fullnamePipe.transform(umpire),
       buttons: [
         {
-          text: 'Nem',
+          text: this.translationService.translate('no'),
           role: 'cancel'
         },
         {
-          text: 'Igen',
+          text: this.translationService.translate('yes'),
           role: 'confirm',
           handler: () => {
             // TODO: also remove from first tab

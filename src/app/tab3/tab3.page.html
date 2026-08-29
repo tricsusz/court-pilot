@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Beállítások</ion-title>
+    <ion-title>{{ 'settings' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -12,10 +12,22 @@
 
         <ion-list>
           <ion-item>
+            <ion-select
+              [label]="'language' | translate"
+              [value]="translationService.language()"
+              (ionChange)="updateLanguage($event)"
+              interface="popover">
+              <ion-select-option value="en"> English </ion-select-option>
+
+              <ion-select-option value="hu"> Magyar </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
             <ion-toggle
               [checked]="currentSettings.withServiceJudge"
               (ionChange)="updateWithServiceJudge($event)">
-              Adogatásbíró
+              {{ 'serviceJudge' | translate }}
             </ion-toggle>
           </ion-item>
 
@@ -23,13 +35,13 @@
             <ion-toggle
               [checked]="currentSettings.showAlert"
               (ionChange)="updateShowAlert($event)">
-              Figyelmeztetések megjelenítése a gyors gomboknál
+              {{ 'showAlerts' | translate }}
             </ion-toggle>
           </ion-item>
 
           <ion-item>
             <ion-input
-              label="Pályák száma"
+              [label]="'numberOfCourts' | translate"
               type="number"
               min="1"
               labelPlacement="floating"

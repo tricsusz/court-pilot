@@ -8,12 +8,13 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { gridOutline, peopleOutline, settingsOutline } from 'ionicons/icons';
+import { TranslatePipe } from '../i18n/translation.pipe';
 
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel]
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, TranslatePipe]
 })
 export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);
