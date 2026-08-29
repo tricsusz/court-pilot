@@ -12,7 +12,8 @@ import {
   IonCol,
   IonRow,
   IonSelect,
-  IonSelectOption
+  IonSelectOption,
+  IonLabel
 } from '@ionic/angular/standalone';
 import { SettingsService } from '../services/settings-service';
 import { CourtUmpireService } from '../services/court.umpire.service';
@@ -41,7 +42,8 @@ import { TranslatePipe } from '../i18n/translation.pipe';
     IonContent,
     IonSelect,
     IonSelectOption,
-    TranslatePipe
+    TranslatePipe,
+    IonLabel
   ]
 })
 export class Tab3Page {

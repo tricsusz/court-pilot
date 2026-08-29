@@ -39,7 +39,8 @@ export const translations = {
     sendUmpireToCourt: 'Are you sure you want to send them to the court?',
     sendUmpiresToCourt: 'Are you sure you want to send them to the court?',
     sendUmpireMessage: '{umpire}',
-    sendUmpiresMessage: '{umpire} - {serviceJudge}'
+    sendUmpiresMessage: '{umpire} - {serviceJudge}',
+    version: 'Version',
   },
 
   hu: {
@@ -77,7 +78,8 @@ export const translations = {
     sendUmpireToCourt: 'Biztos pályára küldöd őt?',
     sendUmpiresToCourt: 'Biztos pályára küldöd őket?',
     sendUmpireMessage: '{umpire}',
-    sendUmpiresMessage: '{umpire} - {serviceJudge}'
+    sendUmpiresMessage: '{umpire} - {serviceJudge}',
+    version: 'Verzió',
   }
 } as const;
 
