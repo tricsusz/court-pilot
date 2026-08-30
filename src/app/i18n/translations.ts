@@ -41,6 +41,8 @@ export const translations = {
     sendUmpireMessage: '{umpire}',
     sendUmpiresMessage: '{umpire} - {serviceJudge}',
     version: 'Version',
+    updateAvailable: 'Update available',
+    newVersion: 'A new version {version} is available. The application will restart to install the update.'
   },
 
   hu: {
@@ -80,6 +82,8 @@ export const translations = {
     sendUmpireMessage: '{umpire}',
     sendUmpiresMessage: '{umpire} - {serviceJudge}',
     version: 'Verzió',
+    updateAvailable: 'Új verzió elérhető',
+    newVersion: 'Új elérhető verzió: {version} is available. A frissítések telepítése után az alkalmazás újraindul.',
   }
 } as const;
 
