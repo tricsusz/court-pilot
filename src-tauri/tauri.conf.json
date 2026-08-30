@@ -2,9 +2,9 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "court-pilot",
   "version": "1.0.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.courtpilot.dev",
   "build": {
-    "frontendDist": "../wwww",
+    "frontendDist": "../www",
     "devUrl": "http://localhost:8103",
     "beforeDevCommand": "npm start",
     "beforeBuildCommand": "ionic build"
@@ -37,6 +37,15 @@
     ],
     "android": {
       "debugApplicationIdSuffix": ".debug"
+    },
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://cdn.crabnebula.app/update/trweb/court-pilot/{{target}}-{{arch}}/{{current_version}}"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEY3MDU5NkNDN0Y3QTQ3RDgKUldUWVIzcC96SllGOTduTUFweEUraTE2WUxjczRJNDdoaFFIb1VRT1o5aHdJeFg2RlRlUGoxRTcK"
     }
   }
 }
