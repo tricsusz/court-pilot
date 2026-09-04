@@ -91,6 +91,8 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Publish CrabNebula release
         uses: crabnebula-dev/cloud-release@v0
         with:
