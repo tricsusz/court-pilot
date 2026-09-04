@@ -72,9 +72,6 @@ jobs:
       - name: Install Ionic CLI
         run: npm install -g @ionic/cli
 
-      - name: Build Tauri
-        run: npm run tauri build
-
       - name: Build Tauri app
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
