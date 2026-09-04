@@ -96,3 +96,5 @@ jobs:
         with:
           command: release publish ${{ env.CN_APPLICATION }} --framework tauri
           api-key: ${{ secrets.CN_API_KEY }}
+          path: ./src-tauri
+          working-directory: ./src-tauri
