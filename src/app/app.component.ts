@@ -41,10 +41,28 @@ export class AppComponent {
               text: 'OK',
               handler: async () => {
                 try {
+                  // Show loading message
+                  alert.message =
+                    this.translationService.translate('updateDownloading');
+
+                  // Disable the button while updating
+                  const okButton = alert.buttons[0];
+                  if (typeof okButton !== 'string') {
+                    okButton.htmlAttributes = { disabled: true };
+                  }
+
                   await update.downloadAndInstall();
                   await relaunch();
                 } catch (error) {
                   console.error('Failed to install update:', error);
+                  alert.message =
+                    this.translationService.translate('updateFailed');
+
+                  const okButton = alert.buttons[0];
+                  // Re-enable the button if the update failed
+                  if (typeof okButton !== 'string') {
+                    okButton.htmlAttributes = { disabled: false };
+                  }
                 }
               }
             }

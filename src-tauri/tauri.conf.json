@@ -15,10 +15,11 @@
         "minHeight": 600,
         "minWidth": 800,
         "title": "Court Pilot",
-        "width": 1366,
-        "height": 768,
+        "width": 800,
+        "height": 600,
         "resizable": true,
-        "fullscreen": true
+        "fullscreen": false,
+        "center": true
       }
     ],
     "security": {
