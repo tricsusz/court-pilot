@@ -42,7 +42,9 @@ export const translations = {
     sendUmpiresMessage: '{umpire} - {serviceJudge}',
     version: 'Version',
     updateAvailable: 'Update available',
-    newVersion: 'A new version {version} is available. The application will restart to install the update.'
+    newVersion: 'A new version {version} is available. The application will restart to install the update.',
+    english: 'English',
+    hungarian: 'Hungarian',
   },
 
   hu: {
@@ -68,12 +70,12 @@ export const translations = {
     confirmDeleteUmpire: 'Biztosan törölni szeretnéd ezt a tisztségviselőt?',
     no: 'Nem',
     yes: 'Igen',
-    umpires: 'Játékeveztők',
+    umpires: 'Játékvezetők',
     serviceJudges: 'Adogatásbírók',
     notOnDuty: 'Pihenő',
     shortCourtName: 'P',
     court: 'Pálya',
-    umpire: 'Játékeveztő',
+    umpire: 'Játékvezető',
     removeUmpireFromCourt: 'Biztos leveszed őt a pályáról?',
     removeUmpiresFromCourt: 'Biztos leveszed őket a pályáról?',
     courtConfirm: 'Pálya {courtNo}',
@@ -84,6 +86,8 @@ export const translations = {
     version: 'Verzió',
     updateAvailable: 'Új verzió elérhető',
     newVersion: 'Új elérhető verzió: {version} is available. A frissítések telepítése után az alkalmazás újraindul.',
+    english: 'Angol',
+    hungarian: 'Magyar',
   }
 } as const;
 

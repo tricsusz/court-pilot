@@ -17,9 +17,13 @@
               [value]="translationService.language()"
               (ionChange)="updateLanguage($event)"
               interface="popover">
-              <ion-select-option value="en"> English </ion-select-option>
+              <ion-select-option value="en">
+                {{ 'english' | translate }}
+              </ion-select-option>
 
-              <ion-select-option value="hu"> Magyar </ion-select-option>
+              <ion-select-option value="hu">
+                {{ 'hungarian' | translate }}
+              </ion-select-option>
             </ion-select>
           </ion-item>
 
@@ -57,7 +61,9 @@
     <ion-row>
       <ion-col sizeLg="6" pushLg="3">
         <ion-item>
-          <ion-label class="ion-text-center">{{ 'version' | translate }}: 1.0.0</ion-label>
+          <ion-label class="ion-text-center"
+            >{{ 'version' | translate }}: 1.0.0</ion-label
+          >
         </ion-item>
       </ion-col>
     </ion-row>

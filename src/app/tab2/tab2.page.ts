@@ -102,8 +102,8 @@ export class Tab2Page {
     this.modal.dismiss(null, 'cancel');
   }
 
-  confirm() {
-    this.modal.dismiss(
+  async confirm() {
+    await this.modal.dismiss(
       {
         lastName: this.lastName,
         firstName: this.firstName,
@@ -112,6 +112,11 @@ export class Tab2Page {
       },
       'confirm'
     );
+
+    this.lastName = '';
+    this.firstName = '';
+    this.country = '';
+    this.gender = '';
   }
 
   isValidUmpire(): boolean {
