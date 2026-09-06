@@ -42,11 +42,13 @@ export const translations = {
     sendUmpiresMessage: '{umpire} - {serviceJudge}',
     version: 'Version',
     updateAvailable: 'Update available',
-    newVersion: 'A new version {version} is available. The application will restart to install the update.',
+    newVersion:
+      'A new version {version} is available. The application will restart to install the update.',
     english: 'English',
     hungarian: 'Hungarian',
-    updateDownloading: 'Downloading and installing update...',
-    updateFailed: 'Failed to install the update. Please try again.',
+    updateDownloading: 'Downloading update...',
+    updateInstalling: 'Installing update...',
+    updateFailed: 'Failed to install the update. Please try again.'
   },
 
   hu: {
@@ -87,11 +89,13 @@ export const translations = {
     sendUmpiresMessage: '{umpire} - {serviceJudge}',
     version: 'Verzió',
     updateAvailable: 'Új verzió elérhető',
-    newVersion: 'Új elérhető verzió: {version}. A frissítések telepítése után az alkalmazás újraindul.',
+    newVersion:
+      'Új elérhető verzió: {version}. A frissítések telepítése után az alkalmazás újraindul.',
     english: 'Angol',
     hungarian: 'Magyar',
-    updateDownloading: 'Frissítés letöltése és telepítése...',
+    updateDownloading: 'Frissítés letöltése...',
     updateFailed: 'Frissítés sikertelen. Kérlek próbáld újra.',
+    updateInstalling: 'Frissítés telepítése...'
   }
 } as const;
 

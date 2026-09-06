@@ -12,9 +12,12 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CN_APPLICATION: "trweb/court-pilot"
+  CN_APPLICATION: 'trweb/court-pilot'
 
 jobs:
+  # ---------------------------------------------------------
+  # Create CrabNebula draft release
+  # ---------------------------------------------------------
   draft:
     runs-on: ubuntu-22.04
 
@@ -27,18 +30,13 @@ jobs:
           command: release draft ${{ env.CN_APPLICATION }} --framework tauri
           api-key: ${{ secrets.CN_API_KEY }}
 
-  build:
+  # ---------------------------------------------------------
+  # Windows Tauri build
+  # ---------------------------------------------------------
+  windows:
     needs: draft
 
-    strategy:
-      fail-fast: false
-
-      matrix:
-        os:
-          - ubuntu-22.04
-          - windows-latest
-
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
@@ -55,16 +53,6 @@ jobs:
         with:
           toolchain: stable
           cache: true
-
-      - name: Install Linux dependencies
-        if: matrix.os == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            webkit2gtk-4.1 \
-            libappindicator3-dev \
-            librsvg2-dev \
-            patchelf
 
       - name: Install dependencies
         run: npm ci
@@ -85,8 +73,97 @@ jobs:
           api-key: ${{ secrets.CN_API_KEY }}
           path: ./src-tauri
 
+  # ---------------------------------------------------------
+  # Linux Tauri build + Snap
+  # ---------------------------------------------------------
+  snap:
+    needs: draft
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache: true
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libssl-dev \
+            libxdo-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libwebkit2gtk-4.1-dev \
+            dpkg
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Ionic CLI
+        run: npm install -g @ionic/cli
+
+      - name: Build Tauri Debian package
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npm run tauri build -- --bundles deb
+
+      - name: Extract Debian package
+        run: |
+          rm -rf snap-root
+          mkdir -p snap-root
+
+          dpkg -x src-tauri/target/release/bundle/deb/*.deb snap-root/
+
+      - name: Show extracted Snap filesystem
+        run: |
+          echo "Snap root:"
+          find snap-root -maxdepth 5 -type f | sort
+
+      - name: Build Snap
+        uses: snapcore/action-build@v1
+        id: snapcraft
+        with:
+          snapcraft-channel: stable
+
+      - name: Show generated Snap
+        run: |
+          echo "Snap created:"
+          echo "${{ steps.snapcraft.outputs.snap }}"
+
+      - name: Upload Snap as GitHub artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: court-pilot-snap
+          path: ${{ steps.snapcraft.outputs.snap }}
+
+      - name: Publish Snap to Snap Store
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        with:
+          snap: ${{ steps.snapcraft.outputs.snap }}
+          release: edge
+
+  # ---------------------------------------------------------
+  # Publish CrabNebula release
+  # ---------------------------------------------------------
   publish:
-    needs: build
+    needs:
+      - windows
+      - snap
 
     runs-on: ubuntu-22.04
 
