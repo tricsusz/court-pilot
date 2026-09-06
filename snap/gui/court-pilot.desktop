@@ -1,0 +1,9 @@
+[Desktop Entry]
+Categories=
+Comment=Court Pilot
+Exec=court-pilot
+StartupWMClass=court-pilot
+Icon=${SNAP}/meta/gui/court-pilot.png
+Name=court-pilot
+Terminal=false
+Type=Application
