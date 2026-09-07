@@ -54,6 +54,9 @@ jobs:
           toolchain: stable
           cache: true
 
+      - name: Install Windows build dependencies
+        run: choco install -y visualstudio2022-workload-nativedesktop
+
       - name: Install dependencies
         run: npm ci
 
