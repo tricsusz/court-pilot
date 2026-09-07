@@ -2,10 +2,17 @@ name: court-pilot
 title: Court Pilot
 contact:
   - toth.richard@trweb.hu
+issues:
+  - https://github.com/tricsusz/court-pilot/issues
+source-code:
+  - https://github.com/tricsusz/court-pilot
+website:
+  - https://github.com/tricsusz/court-pilot
+license: MIT
 base: core24
 icon: snap/gui/court-pilot.png
 
-version: '1.1.3'
+version: '1.1.4'
 
 summary: Badminton umpire rotation application
 

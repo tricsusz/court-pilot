@@ -155,7 +155,7 @@ jobs:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
         with:
           snap: ${{ steps.snapcraft.outputs.snap }}
-          release: edge
+          release: stable
 
   # ---------------------------------------------------------
   # Publish CrabNebula release
