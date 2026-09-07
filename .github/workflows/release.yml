@@ -48,16 +48,6 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Setup MSVC Toolchain
-        uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Install WebView2 Runtime
-        run: |
-          $progressPreference = 'silentlyContinue'
-          Invoke-WebRequest -Uri "https://go.microsoft.com/fwlink/p/?LinkId=2124703" -OutFile "MicrosoftEdgeWebview2Setup.exe"
-          & .\MicrosoftEdgeWebview2Setup.exe /silent /install
-          Remove-Item "MicrosoftEdgeWebview2Setup.exe"
-
       - name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
