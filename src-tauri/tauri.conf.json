@@ -42,7 +42,7 @@
     },
     "createUpdaterArtifacts": true,
     "license": "MIT",
-    "licenseFile": "../LICENSE"
+    "licenseFile": "../LICENCE"
   },
   "plugins": {
     "updater": {
