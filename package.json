@@ -1,8 +1,8 @@
 {
   "name": "court-pilot",
-  "version": "1.1.4",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "version": "1.1.5",
+  "author": "Richard Toth",
+  "homepage": "https://github.com/tricsusz/court-pilot",
   "scripts": {
     "ng": "ng",
     "start": "ionic serve --host=0.0.0.0",
@@ -67,5 +67,5 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.9.0"
   },
-  "description": "An Ionic project"
+  "description": "Manage court officials"
 }
