@@ -9,26 +9,51 @@
 - npm
 - Ionic CLI available as `ionic`
 
-Select the project Node.js version before running any npm command:
+### Shell and NVM setup
 
-```sh
-nvm install
-nvm use
+The command examples in this repository target **Bash** on Linux, macOS,
+or Windows WSL. If your usual shell is fish, start `bash` before using them.
+`nvm.fish` is a separate implementation; its functions are unavailable in Bash.
+
+Check for the Bash NVM installation:
+
+```bash
+test -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh"
 ```
 
-Run `nvm use` again in every new shell and after switching versions for another project. Agent terminal commands start separate shell processes, so they must activate Jod in the same command invocation as the npm command when shell state is not retained.
+If this check fails, agents must ask the user for permission before installing
+NVM. After approval, follow the official
+[NVM installation instructions](https://github.com/nvm-sh/nvm#installing-and-updating).
+Use the default `~/.nvm` location, or set `NVM_DIR` to your existing Bash NVM
+installation. Keep an existing fish installation separate.
+
+After NVM is installed, install the required Node release from the project root:
+
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm install lts/jod
+```
+
+Every npm command block below explicitly loads NVM and selects `lts/jod`.
+This also works in noninteractive Bash sessions that do not load `.bashrc`.
+Run each block from the project root. Stop if loading NVM or selecting Node fails;
+do not fall back to the system Node version.
 
 Install exact project dependencies with:
 
-```sh
-nvm use lts/jod
-npm ci
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm use lts/jod && npm ci
 ```
 
 If needed, install Ionic CLI globally:
 
-```sh
-npm install --global @ionic/cli
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm use lts/jod && npm install --global @ionic/cli
 ```
 
 The committed `.nvmrc` uses the named `lts/jod` alias. Do not replace it with another Node release or add `.tool-versions` unless the team intentionally changes version-management tools.
@@ -41,14 +66,18 @@ Install Rust stable and the Tauri 2 prerequisites for your operating system. `sr
 
 Start the Ionic development server:
 
-```sh
-npm start
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm use lts/jod && npm start
 ```
 
 Build the Angular application:
 
-```sh
-npm run build
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm use lts/jod && npm run build
 ```
 
 The production web output is generated under `www/`. Do not edit that directory manually.
@@ -74,9 +103,11 @@ Prettier is currently an editor workflow; the repository does not declare a Pret
 
 Run Tauri commands through the npm script:
 
-```sh
-npm run tauri dev
-npm run tauri build
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm use lts/jod && npm run tauri dev
+nvm use lts/jod && npm run tauri build
 ```
 
 Tauri development intentionally expects the frontend at `http://localhost:8103`. `devUrl` only tells Tauri where to connect; the Ionic command must also listen on port `8103`. The current `npm start` script does not explicitly select that port, so verify the complete development flow when changing Tauri or serve configuration.

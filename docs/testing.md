@@ -6,16 +6,24 @@ Angular unit tests use Jasmine and Karma. Test files are colocated with their su
 
 ## Local test commands
 
+These examples target Bash and run from the project root. Complete the
+[shell and NVM setup](development.md#shell-and-nvm-setup) first. Agents must ask
+permission before installing missing Bash NVM. Each npm block loads NVM explicitly.
+
 Run the interactive test suite:
 
-```sh
-npm test
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm use lts/jod && npm test
 ```
 
 Run the configured non-watching CI test mode:
 
-```sh
-npm test -- --configuration=ci
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm use lts/jod && npm test -- --configuration=ci
 ```
 
 The test environment requires an available Chrome installation. Test coverage output, when enabled by the test runner, is written under `coverage/app/`.
@@ -24,14 +32,18 @@ The test environment requires an available Chrome installation. Test coverage ou
 
 Lint TypeScript and Angular templates:
 
-```sh
-npm run lint
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm use lts/jod && npm run lint
 ```
 
 Build the production Angular application:
 
-```sh
-npm run build
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm use lts/jod && npm run build
 ```
 
 Check Rust changes from the Tauri directory:
@@ -44,15 +56,15 @@ cargo check
 
 Choose checks based on the changed area:
 
-| Change | Expected validation |
-|---|---|
-| Documentation only | Markdown/editor diagnostics and `git diff --check` |
-| Angular TypeScript or template | Related tests, `npm run lint`, and `npm run build` |
-| Service or domain behavior | Behavior-focused service/page tests, lint, and build |
-| Dexie schema or migration | Migration tests where practical, lint, and build |
-| Styles only | Build and visual verification at relevant viewport sizes |
-| Rust code | `cargo check` plus relevant Rust tests if introduced |
-| Tauri/release configuration | Build/config checks available on the host; report untested platforms |
+| Change                         | Expected validation                                                  |
+| ------------------------------ | -------------------------------------------------------------------- |
+| Documentation only             | Markdown/editor diagnostics and `git diff --check`                   |
+| Angular TypeScript or template | Related tests, `npm run lint`, and `npm run build`                   |
+| Service or domain behavior     | Behavior-focused service/page tests, lint, and build                 |
+| Dexie schema or migration      | Migration tests where practical, lint, and build                     |
+| Styles only                    | Build and visual verification at relevant viewport sizes             |
+| Rust code                      | `cargo check` plus relevant Rust tests if introduced                 |
+| Tauri/release configuration    | Build/config checks available on the host; report untested platforms |
 
 ## Testing conventions
 
