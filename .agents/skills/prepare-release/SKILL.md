@@ -41,6 +41,8 @@ Present the developer with:
 
 Then explicitly ask the developer to either accept the recommendation or enter a different version. Do not edit versions until they answer.
 
+During release version confirmation, ask whether to run the test suite or skip it. Running tests is the default; skip them only when the developer explicitly chooses to skip. Record any skipped tests in the release validation report. Lint, build, and Cargo checks still apply.
+
 Validate the selected value as Semantic Versioning. It should normally be greater than both the current released version and latest release tag. Warn and request confirmation for a lower, equal, or prerelease version.
 
 Release tags use the selected value prefixed with `v`, such as `v1.2.0`.
@@ -72,7 +74,7 @@ After editing `Cargo.toml`, run `cargo check` from `src-tauri/` and confirm Carg
 
 ## Validate
 
-Activate the required Node.js version, then run the checks in order. Keep `nvm use lts/jod` in the same shell session as the npm commands:
+Honor the developer's test choice: run the test command by default and omit it only when they explicitly chose to skip. Activate the required Node.js version, then run the checks in order. Keep `nvm use lts/jod` in the same shell session as the npm commands:
 
 ```sh
 nvm use lts/jod
@@ -127,7 +129,7 @@ Report:
 - recommended bump and reasoning
 - version selected by the developer
 - files whose versions were synchronized
-- test, lint, Angular build, and Cargo results
+- test, lint, Angular build, and Cargo results, explicitly noting any tests skipped at the developer's request
 - platform builds not run locally
 - local release tag created and its target commit
 - whether the tag remains local or was explicitly pushed

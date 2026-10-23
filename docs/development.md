@@ -149,6 +149,8 @@ Use the highest applicable bump. Because older repository commits do not consist
 
 Show the current version, latest tag, recommendation, bump type, and reasoning to the developer. The developer may accept the recommendation or enter a different semantic version. Do not update files until the developer confirms the final version. Warn before using a version that is not greater than the current release or before using a prerelease identifier.
 
+During release version confirmation, ask whether to run the test suite or skip it. Running tests is the default; skip them only when the developer explicitly chooses to skip. Record any skipped tests in the release validation report. Lint, build, and Cargo checks still apply.
+
 ### Synchronize the selected version
 
 After confirmation, set the same semantic version in:
@@ -171,7 +173,7 @@ cargo check
 
 This validates the Rust package and refreshes its lockfile metadata when needed.
 
-Then verify that all version declarations match and run the checks in `docs/testing.md`.
+Then verify that all version declarations match and run the checks in `docs/testing.md`, honoring the developer's test choice.
 
 ### Create the release tag
 

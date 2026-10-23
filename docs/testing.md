@@ -28,6 +28,22 @@ nvm use lts/jod && npm test -- --configuration=ci
 
 The test environment requires an available Chrome installation. Test coverage output, when enabled by the test runner, is written under `coverage/app/`.
 
+Run the suite once in headless Chrome with a coverage report:
+
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm use lts/jod && npm test -- --watch=false --browsers=ChromeHeadless --code-coverage
+```
+
+If Chrome is not auto-detected, set `CHROME_BIN` to its executable path
+(for example, `/snap/bin/chromium`) before running the command. Open
+`coverage/app/index.html` to inspect coverage by file.
+
+The queue and assignment service tests exercise real browser IndexedDB, clearing
+their tables before and after each test. Court rotation page tests use service
+spies and signals to isolate assignments, confirmation, and role swaps.
+
 ## Lint and build
 
 Lint TypeScript and Angular templates:

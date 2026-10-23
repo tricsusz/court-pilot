@@ -112,6 +112,8 @@ For every release, keep the same semantic version in:
 
 The version displayed in the Settings UI must match these values. Before editing them, inspect Conventional Commits since the latest release tag and recommend the appropriate SemVer bump. If messages are ambiguous, inspect the code/configuration diff since that tag. Present the recommendation and reasoning, allow the developer to enter a different version, and wait for confirmation before changing files. Follow the manual checklist in `docs/development.md`; do not introduce release automation unless requested.
 
+During release version confirmation, ask whether to run the test suite or skip it. Running tests is the default; skip them only when the developer explicitly chooses to skip. Record any skipped tests in the release validation report. Lint, build, and Cargo checks still apply.
+
 After the confirmed version is synchronized, committed, and validated, create the matching lightweight local tag with `GIT_EDITOR=true git tag v<version>`. Never tag uncommitted version changes. Do not push the tag without explicit permission because pushing it triggers the release workflow.
 
 ## Validation expectations
