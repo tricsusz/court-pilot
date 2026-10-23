@@ -74,6 +74,56 @@ jobs:
           path: ./src-tauri
 
   # ---------------------------------------------------------
+  # macOS Tauri builds (Apple Silicon and Intel)
+  # ---------------------------------------------------------
+  macos:
+    needs: draft
+
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - aarch64-apple-darwin
+          - x86_64-apple-darwin
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          cache: true
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Ionic CLI
+        run: npm install -g @ionic/cli
+
+      - name: Build Tauri macOS packages
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npm run tauri build -- --target ${{ matrix.target }} --bundles app,dmg
+
+      - name: Upload release assets to CrabNebula
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ secrets.CN_API_KEY }}
+          path: ./src-tauri
+
+  # ---------------------------------------------------------
   # Linux Tauri build + Snap
   # ---------------------------------------------------------
   snap:
@@ -163,6 +213,7 @@ jobs:
   publish:
     needs:
       - windows
+      - macos
       - snap
 
     runs-on: ubuntu-22.04
