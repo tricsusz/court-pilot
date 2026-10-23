@@ -1,0 +1,173 @@
+# Development Guide
+
+## Prerequisites
+
+### Web development
+
+- NVM
+- Node.js `lts/jod` (Node.js 22), matching `.nvmrc` and the release workflow
+- npm
+- Ionic CLI available as `ionic`
+
+Select the project Node.js version before running any npm command:
+
+```sh
+nvm install
+nvm use
+```
+
+Run `nvm use` again in every new shell and after switching versions for another project. Agent terminal commands start separate shell processes, so they must activate Jod in the same command invocation as the npm command when shell state is not retained.
+
+Install exact project dependencies with:
+
+```sh
+nvm use lts/jod
+npm ci
+```
+
+If needed, install Ionic CLI globally:
+
+```sh
+npm install --global @ionic/cli
+```
+
+The committed `.nvmrc` uses the named `lts/jod` alias. Do not replace it with another Node release or add `.tool-versions` unless the team intentionally changes version-management tools.
+
+### Desktop development
+
+Install Rust stable and the Tauri 2 prerequisites for your operating system. `src-tauri/Cargo.toml` declares Rust 1.77.2 as the minimum supported Rust version.
+
+## Web workflow
+
+Start the Ionic development server:
+
+```sh
+npm start
+```
+
+Build the Angular application:
+
+```sh
+npm run build
+```
+
+The production web output is generated under `www/`. Do not edit that directory manually.
+
+## Code formatting
+
+Use an editor Prettier plugin for files you change. The root `.prettierrc` is the repository's shared formatting configuration and is discovered automatically by compatible plugins.
+
+Its main rules are:
+
+- 80-character print width
+- two spaces, not tabs
+- semicolons
+- single quotes
+- no trailing commas
+- opening brackets kept on the same line where supported
+
+For VS Code, install the recommended `esbenp.prettier-vscode` extension, select Prettier as the formatter, and use **Format Document** or format-on-save. Do not introduce personal overrides that conflict with `.prettierrc`, and do not reformat unrelated files during a focused change.
+
+Prettier is currently an editor workflow; the repository does not declare a Prettier npm dependency or formatting script. Do not claim a CLI formatting check exists unless one is added later.
+
+## Tauri workflow
+
+Run Tauri commands through the npm script:
+
+```sh
+npm run tauri dev
+npm run tauri build
+```
+
+Tauri development intentionally expects the frontend at `http://localhost:8103`. `devUrl` only tells Tauri where to connect; the Ionic command must also listen on port `8103`. The current `npm start` script does not explicitly select that port, so verify the complete development flow when changing Tauri or serve configuration.
+
+The desktop wrapper is under `src-tauri/`. Do not edit generated `src-tauri/target/` or `src-tauri/gen/` content.
+
+## Data storage
+
+Court Pilot has no backend API. It stores domain data in IndexedDB using Dexie. The database and schema are declared in root-level `db.ts`.
+
+Changing an interface in `db.ts` may require a database migration for existing users. Follow `.agents/skills/database-change/SKILL.md` for schema work.
+
+The selected UI language is stored separately in browser local storage under the `language` key.
+
+## Localization workflow
+
+English and Hungarian are both required for user-facing text.
+
+1. Add the same translation key to `en` and `hu` in `src/app/i18n/translations.ts`.
+2. Preserve identical placeholder names, such as `{courtNo}`, in both translations.
+3. Use `TranslatePipe` in templates.
+4. Use `TranslationService` for alerts or other strings created in TypeScript.
+5. Build the application so strict translation-key and template typing is checked.
+
+## Manual release versioning
+
+Court Pilot uses one application version across its JavaScript, Rust, Tauri, and Snap packages. Releases are updated manually; there is no version synchronization script.
+
+### Select the next version
+
+Before changing files, review commits since the latest release tag and recommend a Semantic Versioning bump:
+
+- Breaking change (`!` or `BREAKING CHANGE:`) → major
+- Backward-compatible `feat` → minor
+- Backward-compatible `fix` or `perf` → patch
+- Documentation, tests, refactoring, build, CI, chores, and style changes normally do not require a bump by themselves
+
+Use the highest applicable bump. Because older repository commits do not consistently follow Conventional Commits, inspect the implementation and configuration diff since the latest tag whenever the messages are ambiguous. Base the recommendation on shipped behavior, data compatibility, packaging, and supported platforms—not only commit wording.
+
+Show the current version, latest tag, recommendation, bump type, and reasoning to the developer. The developer may accept the recommendation or enter a different semantic version. Do not update files until the developer confirms the final version. Warn before using a version that is not greater than the current release or before using a prerelease identifier.
+
+### Synchronize the selected version
+
+After confirmation, set the same semantic version in:
+
+1. `package.json` — top-level `version`
+2. `package-lock.json` — root package `version`
+3. `src-tauri/tauri.conf.json` — top-level `version`
+4. `src-tauri/Cargo.toml` — `[package].version`
+5. `src-tauri/Cargo.lock` — the `court-pilot` package entry, normally refreshed by Cargo
+6. `snap/snapcraft.yaml` — top-level `version`
+7. The version displayed by `src/app/tab3/tab3.page.html`
+
+The current Settings page contains a hardcoded version. Until it is changed to consume build metadata, it must be updated manually for every release.
+
+After editing `Cargo.toml`, run from `src-tauri/`:
+
+```sh
+cargo check
+```
+
+This validates the Rust package and refreshes its lockfile metadata when needed.
+
+Then verify that all version declarations match and run the checks in `docs/testing.md`.
+
+### Create the release tag
+
+The synchronized version changes must be committed before tagging. Git tags point to commits and do not include uncommitted working-tree changes. Verify that the intended release commit contains every version update and that the tracked working tree is clean.
+
+Release tags are lightweight tags, matching the repository's existing convention. Confirm the tag does not already exist, then create it with the selected version prefixed by `v`:
+
+```sh
+GIT_EDITOR=true git tag v1.2.0
+```
+
+Replace `1.2.0` with the confirmed release version and verify the tag points to the intended commit. Do not overwrite or move an existing release tag.
+
+Creating the tag is local. Pushing it starts `.github/workflows/release.yml`, which builds Windows and macOS artifacts for CrabNebula and builds/publishes the Linux Snap. Push only after explicit confirmation:
+
+```sh
+git push origin v1.2.0
+```
+
+## Generated and local directories
+
+Do not manually edit or commit generated/dependency content unless a workflow explicitly requires an artifact:
+
+- `node_modules/`
+- `.angular/`
+- `www/`
+- `coverage/`
+- `src-tauri/target/`
+- `src-tauri/gen/`
+- generated `snap-root/`
