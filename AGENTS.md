@@ -99,7 +99,7 @@ Do not manually edit generated output or installed dependencies:
 - Run linting: `npm run lint`
 - Run Tauri CLI commands: `npm run tauri -- <command>`
 
-Tauri development intentionally uses port `8103`. `src-tauri/tauri.conf.json` expects that port, so its `beforeDevCommand` must start Ionic on `8103`; the current `npm start` script does not explicitly select it. Verify the full `npm run tauri dev` flow before claiming it works.
+Tauri development intentionally uses port `8103`. `src-tauri/tauri.conf.json` expects that port, so its `beforeDevCommand` starts the project's Angular CLI with `serve --host=0.0.0.0 --port=8103`. Keep the command aligned with `devUrl`. Verify the full `npm run tauri dev` flow before claiming it works.
 
 ## Release versioning
 

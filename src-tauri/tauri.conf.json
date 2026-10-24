@@ -7,7 +7,7 @@
   "build": {
     "frontendDist": "../www",
     "devUrl": "http://localhost:8103",
-    "beforeDevCommand": "npm start",
+    "beforeDevCommand": "npm run ng -- serve --host=0.0.0.0 --port=8103",
     "beforeBuildCommand": "ionic build"
   },
   "app": {

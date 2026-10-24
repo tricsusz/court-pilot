@@ -137,7 +137,7 @@ nvm use lts/jod && npm run tauri dev
 nvm use lts/jod && npm run tauri build
 ```
 
-Tauri development intentionally expects the frontend at `http://localhost:8103`. `devUrl` only tells Tauri where to connect; the Ionic command must also listen on port `8103`. The current `npm start` script does not explicitly select that port, so verify the complete development flow when changing Tauri or serve configuration.
+Tauri development intentionally expects the frontend at `http://localhost:8103`. `devUrl` tells Tauri where to connect, and `beforeDevCommand` runs `npm run ng -- serve --host=0.0.0.0 --port=8103` to serve the frontend on the matching port without opening a browser. This uses the project's Angular CLI and does not require a global Ionic CLI installation. Keep these settings aligned when changing Tauri or serve configuration.
 
 The desktop wrapper is under `src-tauri/`. Do not edit generated `src-tauri/target/` or `src-tauri/gen/` content.
 
