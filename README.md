@@ -4,7 +4,7 @@ Court Pilot is a local-first web and desktop application for managing badminton 
 
 ## Current stack
 
-- Angular 20 and Ionic Angular 8
+- Angular 22 and Ionic Angular 9
 - Dexie / IndexedDB local persistence
 - Angular CDK drag and drop
 - Tauri 2 desktop application

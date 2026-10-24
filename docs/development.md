@@ -5,7 +5,7 @@
 ### Web development
 
 - NVM
-- Node.js `lts/jod` (Node.js 22), matching `.nvmrc` and the release workflow
+- Node.js `lts/jod` (at least Node.js 22.22.3), matching `.nvmrc` and the release workflow
 - npm
 - Ionic CLI available as `ionic`
 
@@ -39,6 +39,10 @@ Every npm command block below explicitly loads NVM and selects `lts/jod`.
 This also works in noninteractive Bash sessions that do not load `.bashrc`.
 Run each block from the project root. Stop if loading NVM or selecting Node fails;
 do not fall back to the system Node version.
+
+Angular 22 requires TypeScript 6.0 and Node.js 22.22.3 or newer on the
+Node.js 22 line. If your installed `lts/jod` is older, run `nvm install lts/jod`
+after loading Bash NVM.
 
 Install exact project dependencies with:
 
@@ -98,6 +102,29 @@ Its main rules are:
 For VS Code, install the recommended `esbenp.prettier-vscode` extension, select Prettier as the formatter, and use **Format Document** or format-on-save. Do not introduce personal overrides that conflict with `.prettierrc`, and do not reformat unrelated files during a focused change.
 
 Prettier is currently an editor workflow; the repository does not declare a Prettier npm dependency or formatting script. Do not claim a CLI formatting check exists unless one is added later.
+
+## Dependency compatibility
+
+Angular major upgrades must run `ng update` one major at a time. The Angular
+21 and 22 migrations preserve Zone.js with `provideZoneChangeDetection()`
+and explicitly select `ChangeDetectionStrategy.Eager` for existing components.
+Ionic 9 standalone components are imported from `@ionic/angular`.
+
+ESLint 10 uses `eslint.config.cjs`; the old `.eslintrc.json` format is no longer
+supported. The flat configuration retains the Angular template and selector rules.
+Unused legacy ESLint plugins and the unused Jasmine spec reporter were removed.
+Tests use the replacement `@angular/platform-browser/testing` API, so the
+deprecated `@angular/platform-browser-dynamic` package is no longer needed.
+The unused `@angular/animations` package was also removed; Ionic manages its
+own animations.
+
+The browser target follows Angular 22's widely available Baseline date,
+2026-05-07. Older browser versions outside that baseline are no longer targeted.
+
+Two scoped npm overrides apply upstream security fixes: Angular's build package
+uses Vite 8.3.5 or newer within v8, and Capacitor's Xcode parser uses UUID 11.1.1
+or newer within v11. Xcode uses the compatible CommonJS `uuid.v4()` API.
+Revisit these overrides when upstream packages include the patched versions.
 
 ## Tauri workflow
 

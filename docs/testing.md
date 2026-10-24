@@ -4,6 +4,10 @@
 
 Angular unit tests use Jasmine and Karma. Test files are colocated with their subjects as `*.spec.ts`. Karma launches Chrome by default and keeps running in watch mode for local development.
 
+Jasmine is kept on the compatible 6.x line. Jasmine 7 does not support Karma
+or Zone.js. The npm overrides make Karma adapters use the same Jasmine core
+as the app rather than installing an older nested copy.
+
 ## Local test commands
 
 These examples target Bash and run from the project root. Complete the

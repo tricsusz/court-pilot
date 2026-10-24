@@ -1,11 +1,16 @@
-import { Component, EnvironmentInjector, inject } from '@angular/core';
+import {
+  Component,
+  EnvironmentInjector,
+  inject,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import {
   IonTabs,
   IonTabBar,
   IonTabButton,
   IonIcon,
   IonLabel
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { gridOutline, peopleOutline, settingsOutline } from 'ionicons/icons';
 import { TranslatePipe } from '../i18n/translation.pipe';
@@ -14,6 +19,7 @@ import { TranslatePipe } from '../i18n/translation.pipe';
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, TranslatePipe]
 })
 export class TabsPage {

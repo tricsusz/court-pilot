@@ -1,10 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import {
   AlertController,
   IonApp,
   IonRouterOutlet,
   LoadingController
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { check, DownloadEvent } from '@tauri-apps/plugin-updater';
 import { isTauri } from '@tauri-apps/api/core';
 import { platform } from '@tauri-apps/plugin-os';
@@ -15,6 +15,7 @@ import { ThemeService } from './services/theme.service';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [IonApp, IonRouterOutlet]
 })
 export class AppComponent {

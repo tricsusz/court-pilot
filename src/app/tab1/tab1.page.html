@@ -21,19 +21,25 @@
       </ion-col>
       <ion-col>
         <ion-item [lines]="'none'">
-          <ion-label class="ion-text-center"> {{ 'umpire' | translate }} </ion-label>
+          <ion-label class="ion-text-center">
+            {{ 'umpire' | translate }}
+          </ion-label>
         </ion-item>
       </ion-col>
       @if (serviceJudgeEnabled()) {
       <ion-col>
         <ion-item [lines]="'none'">
-          <ion-label class="ion-text-center"> {{ 'serviceJudge' | translate }} </ion-label>
+          <ion-label class="ion-text-center">
+            {{ 'serviceJudge' | translate }}
+          </ion-label>
         </ion-item>
       </ion-col>
       }
       <ion-col size="2" sizeLg="1"></ion-col>
     </ion-row>
-    @for (item of [].constructor(settings()?.numberOfCourts); track $index) {
+    @for (item of
+    [].constructor($safeNavigationMigration(settings()?.numberOfCourts)); track
+    $index) {
     <ion-row>
       <ion-col [size]="1" class="court-number">
         <ion-list>
@@ -119,19 +125,25 @@
     <ion-row>
       <ion-col [size]="!serviceJudgeEnabled() ? 6 : 4">
         <ion-item color="primary">
-          <ion-label class="ion-text-center"> {{ 'umpires' | translate }} </ion-label>
+          <ion-label class="ion-text-center">
+            {{ 'umpires' | translate }}
+          </ion-label>
         </ion-item>
       </ion-col>
       @if (serviceJudgeEnabled()) {
       <ion-col [size]="4">
         <ion-item color="primary">
-          <ion-label class="ion-text-center"> {{ 'serviceJudges' | translate }} </ion-label>
+          <ion-label class="ion-text-center">
+            {{ 'serviceJudges' | translate }}
+          </ion-label>
         </ion-item>
       </ion-col>
       }
       <ion-col [size]="!serviceJudgeEnabled() ? 6 : 4">
         <ion-item color="medium">
-          <ion-label class="ion-text-center"> {{ 'notOnDuty' | translate }} </ion-label>
+          <ion-label class="ion-text-center">
+            {{ 'notOnDuty' | translate }}
+          </ion-label>
         </ion-item>
       </ion-col>
     </ion-row>

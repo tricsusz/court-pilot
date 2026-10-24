@@ -6,8 +6,8 @@ Court Pilot is a badminton umpire rotation and court-assignment application. It 
 
 ## Technology
 
-- Angular 20 with standalone components and strict TypeScript
-- Ionic Angular 8 UI components
+- Angular 22 with standalone components and strict TypeScript
+- Ionic Angular 9 UI components
 - Angular signals and RxJS
 - Dexie 4 / IndexedDB for local persistence
 - Angular CDK drag and drop
@@ -45,7 +45,7 @@ Do not manually edit generated output or installed dependencies:
 ## Implementation conventions
 
 - Preserve strict TypeScript and strict Angular template checks.
-- Use standalone Angular components and import Ionic components from `@ionic/angular/standalone`.
+- Use standalone Angular components and import Ionic components from `@ionic/angular`.
 - Prefer `inject()` for dependency injection, matching current components and services.
 - Keep persistent-data access in services rather than directly in page components.
 - Expose reactive Dexie queries through signals when following an existing service pattern.

@@ -1,4 +1,9 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import {
+  Component,
+  inject,
+  ViewChild,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -18,7 +23,7 @@ import {
   IonCol,
   IonLabel,
   AlertController
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { UmpireService } from '../services/umpire.service';
 import { Umpire } from 'db';
 import { addIcons } from 'ionicons';
@@ -35,6 +40,7 @@ import { TranslationService } from '../i18n/translation.service';
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   providers: [FullnamePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     IonLabel,
     IonCol,

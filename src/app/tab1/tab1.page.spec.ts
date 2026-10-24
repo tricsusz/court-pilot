@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { AlertController } from '@ionic/angular/standalone';
+import { AlertController } from '@ionic/angular';
 import { CourtServiceJudge, CourtUmpire, Settings, Umpire } from 'db';
 import { Tab1Page } from './tab1.page';
 import { SettingsService } from '../services/settings-service';

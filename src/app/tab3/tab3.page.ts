@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -14,7 +14,7 @@ import {
   IonSelect,
   IonSelectOption,
   IonLabel
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { SettingsService } from '../services/settings-service';
 import { CourtUmpireService } from '../services/court.umpire.service';
 import { CourtServiceJudgeService } from '../services/court.service.judge.service';
@@ -29,6 +29,7 @@ import { ThemePreference, ThemeService } from '../services/theme.service';
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     IonRow,
     IonCol,

@@ -1,4 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -13,7 +18,7 @@ import {
   IonIcon,
   IonButton,
   AlertController
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { SettingsService } from '../services/settings-service';
 import { UmpireService } from '../services/umpire.service';
 import { Umpire } from 'db';
@@ -27,7 +32,6 @@ import {
   CdkDropList,
   CdkDropListGroup
 } from '@angular/cdk/drag-drop';
-import { CommonModule } from '@angular/common';
 import { CourtUmpireService } from '../services/court.umpire.service';
 import { CourtServiceJudgeService } from '../services/court.service.judge.service';
 import { addIcons } from 'ionicons';
@@ -40,6 +44,7 @@ import { TranslationService } from '../i18n/translation.service';
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
   providers: [FullnamePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     IonButton,
     IonIcon,
@@ -56,7 +61,6 @@ import { TranslationService } from '../i18n/translation.service';
     FullnamePipe,
     CdkDropList,
     CdkDrag,
-    CommonModule,
     CdkDragPlaceholder,
     CdkDropListGroup,
     TranslatePipe
