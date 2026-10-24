@@ -23,6 +23,7 @@ import { WaitingServiceJudgesService } from '../services/waiting-service-judges.
 import { TranslationService } from '../i18n/translation.service';
 import { Language } from '../i18n/translations';
 import { TranslatePipe } from '../i18n/translation.pipe';
+import { ThemePreference, ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-tab3',
@@ -52,6 +53,8 @@ export class Tab3Page {
   readonly courtServiceJudgeService = inject(CourtServiceJudgeService);
   readonly waitingServiceJudgeService = inject(WaitingServiceJudgesService);
   readonly translationService = inject(TranslationService);
+
+  readonly themeService = inject(ThemeService);
 
   readonly settings = this.settingsService.settings;
 
@@ -99,6 +102,10 @@ export class Tab3Page {
     await this.settingsService.update({
       showAlert: event.detail.checked
     });
+  }
+
+  updateTheme(event: CustomEvent<{ value: ThemePreference }>): void {
+    this.themeService.setTheme(event.detail.value);
   }
 
   updateLanguage(event: CustomEvent): void {

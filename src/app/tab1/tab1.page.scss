@@ -1,12 +1,40 @@
 .bottom-lists ion-list {
-    min-height: 64px;
+  min-height: 64px;
 }
 
 .custom-ion-item {
-    cursor: move;
-    padding: 10px 15px;
+  cursor: move;
+  padding: 10px 15px;
 
-    &.primary {
-        background-color: var(--ion-color-primary);
-    }
+  &.primary {
+    background-color: var(--ion-color-primary);
+  }
+}
+
+:host-context(html:not(.ion-palette-dark)) ion-list[cdkDropList] {
+  background-color: var(--ion-color-light);
+}
+
+:host-context(html:not(.ion-palette-dark)) {
+  ion-list[cdkDropList].cdk-drop-list-dragging,
+  .custom-ion-item.primary {
+    background-color: var(--ion-color-step-150, #d9d9d9);
+  }
+
+  .court-actions ion-list {
+    background-color: var(--ion-color-light);
+  }
+
+  .court-actions ion-item {
+    --background: var(--ion-color-light);
+  }
+
+  .court-headers ion-item,
+  .court-number ion-item {
+    --background: var(--ion-color-step-150, #d9d9d9);
+  }
+
+  .court-number ion-list {
+    background-color: var(--ion-color-step-150, #d9d9d9);
+  }
 }

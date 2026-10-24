@@ -10,8 +10,7 @@ import { isTauri } from '@tauri-apps/api/core';
 import { platform } from '@tauri-apps/plugin-os';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { TranslationService } from './i18n/translation.service';
-
-
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +21,8 @@ export class AppComponent {
   readonly alertController: AlertController = inject(AlertController);
   readonly loadingController: LoadingController = inject(LoadingController);
   readonly translationService: TranslationService = inject(TranslationService);
+
+  readonly themeService = inject(ThemeService);
 
   constructor() {
     this.checkForUpdates();

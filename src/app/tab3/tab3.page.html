@@ -53,6 +53,23 @@
               (ionInput)="updateNumberOfCourts($event)">
             </ion-input>
           </ion-item>
+          <ion-item>
+            <ion-select
+              [label]="'theme' | translate"
+              [value]="themeService.theme()"
+              (ionChange)="updateTheme($event)"
+              interface="popover">
+              <ion-select-option value="light">
+                {{ 'themeLight' | translate }}
+              </ion-select-option>
+              <ion-select-option value="dark">
+                {{ 'themeDark' | translate }}
+              </ion-select-option>
+              <ion-select-option value="system">
+                {{ 'themeSystem' | translate }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
         </ion-list>
 
         }

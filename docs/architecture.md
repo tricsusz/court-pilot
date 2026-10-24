@@ -25,7 +25,7 @@ The root route lazy-loads the tab routes. The three primary routes are:
 |---|---|---|
 | `/tabs/pilot` | `src/app/tab1/` | Waiting queues, court assignments, drag and drop, and rotation actions |
 | `/tabs/umpires` | `src/app/tab2/` | Court-official roster management |
-| `/tabs/settings` | `src/app/tab3/` | Court count, service-judge mode, alerts, and language |
+| `/tabs/settings` | `src/app/tab3/` | Court count, theme, service-judge mode, alerts, and language |
 
 Pages are standalone Angular components and directly import the Ionic standalone components they use. Services are root-provided and injected with Angular's `inject()` function.
 
@@ -77,6 +77,13 @@ erDiagram
 ```
 
 Settings use a singleton row with ID `1`. Defaults are five courts, service judges enabled, and confirmation alerts enabled.
+
+Theme preference is stored separately in `localStorage` under `theme`, using
+`light`, `dark`, or `system`. Device-preferred (`system`) is the default when no
+valid preference exists. `ThemeService` restores the selection when the root
+component starts and toggles Ionic's `ion-palette-dark` class. Device theme changes
+apply while the app is open when device-preferred is selected. This does not
+change the Dexie schema or existing settings records.
 
 ### Schema-change policy
 

@@ -5,6 +5,10 @@ export const translations = {
   en: {
     courts: 'Courts',
     numberOfCourts: 'Number of Courts',
+    theme: 'Theme',
+    themeLight: 'Light',
+    themeDark: 'Dark',
+    themeSystem: 'Device-preferred',
     showAlerts: 'Show alerts on quick buttons',
     serviceJudge: 'Service Judge',
     language: 'Language',
@@ -54,6 +58,10 @@ export const translations = {
   hu: {
     courts: 'Pályák',
     numberOfCourts: 'Pályák száma',
+    theme: 'Téma',
+    themeLight: 'Világos',
+    themeDark: 'Sötét',
+    themeSystem: 'Eszközbeállítás szerint',
     showAlerts: 'Figyelmeztetések megjelenítése a gyors gomboknál',
     serviceJudge: 'Adogatásbíró',
     language: 'Nyelv',
