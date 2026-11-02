@@ -1,6 +1,6 @@
 {
   "name": "court-pilot",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "author": "Richard Toth",
   "homepage": "https://github.com/tricsusz/court-pilot",
   "scripts": {
@@ -76,6 +76,11 @@
     },
     "xcode": {
       "uuid": "^11.1.1"
+    },
+    "minimatch@>=9": "^11.0.1",
+    "glob@>=9": "^14.0.2",
+    "http-proxy": {
+      "follow-redirects": "^1.16.2"
     }
   }
 }

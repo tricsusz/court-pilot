@@ -126,6 +126,15 @@ uses Vite 8.3.5 or newer within v8, and Capacitor's Xcode parser uses UUID 11.1.
 or newer within v11. Xcode uses the compatible CommonJS `uuid.v4()` API.
 Revisit these overrides when upstream packages include the patched versions.
 
+The audit overrides also select patched `minimatch` 11 for modern consumers,
+`glob` 14 for consumers of version 9 or newer, and `follow-redirects` 1.16.2 or
+newer for Karma's HTTP proxy. These overrides retain Node.js 22 support. Keep
+Karma's legacy `minimatch` 3 and `glob` 7 dependency paths intact: their callable
+CommonJS APIs differ from the modern packages. npm still reports moderate
+findings through those legacy test dependencies; resolving them requires an
+upstream-compatible test-tooling update. Do not use `npm audit fix --force`,
+which proposes incompatible downgrades of Angular and the test tooling.
+
 ## Tauri workflow
 
 Run Tauri commands through the npm script:
@@ -140,6 +149,44 @@ nvm use lts/jod && npm run tauri build
 Tauri development intentionally expects the frontend at `http://localhost:8103`. `devUrl` tells Tauri where to connect, and `beforeDevCommand` runs `npm run ng -- serve --host=0.0.0.0 --port=8103` to serve the frontend on the matching port without opening a browser. This uses the project's Angular CLI and does not require a global Ionic CLI installation. Keep these settings aligned when changing Tauri or serve configuration.
 
 The desktop wrapper is under `src-tauri/`. Do not edit generated `src-tauri/target/` or `src-tauri/gen/` content.
+
+### Local updater signing
+
+Tauri builds require the private key matching the updater public key in
+`src-tauri/tauri.conf.json`. Set the key path in the build shell; Tauri does not
+load these values from `.env` files. Keep private keys and passwords outside the
+repository.
+
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+export TAURI_SIGNING_PRIVATE_KEY="$HOME/.tauri/myapp.key"
+# For a key without a password:
+export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
+nvm use lts/jod && npm run tauri build
+```
+
+For a password-protected key, replace the empty-password export with a hidden
+prompt in your terminal:
+
+```bash
+read -r -s -p "Signing key password: " TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+echo
+export TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+```
+
+If you keep the password in `$HOME/.tauri/signing-password`, restrict the file to
+your account with `chmod 600 "$HOME/.tauri/signing-password"`, then load it for
+each build without printing it:
+
+```bash
+export TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$(cat "$HOME/.tauri/signing-password")"
+```
+
+This stores the password as plaintext outside the repository. The export applies
+only to the current shell and its child processes.
+
+See the [Tauri updater signing documentation](https://v2.tauri.app/plugin/updater/#building).
 
 ## Data storage
 
