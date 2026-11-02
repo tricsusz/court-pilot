@@ -21,11 +21,11 @@ flowchart TD
 
 The root route lazy-loads the tab routes. The three primary routes are:
 
-| Route | Source | Responsibility |
-|---|---|---|
-| `/tabs/pilot` | `src/app/tab1/` | Waiting queues, court assignments, drag and drop, and rotation actions |
-| `/tabs/umpires` | `src/app/tab2/` | Court-official roster management |
-| `/tabs/settings` | `src/app/tab3/` | Court count, theme, service-judge mode, alerts, and language |
+| Route            | Source          | Responsibility                                                         |
+| ---------------- | --------------- | ---------------------------------------------------------------------- |
+| `/tabs/pilot`    | `src/app/tab1/` | Waiting queues, court assignments, drag and drop, and rotation actions |
+| `/tabs/umpires`  | `src/app/tab2/` | Court-official roster management                                       |
+| `/tabs/settings` | `src/app/tab3/` | Court count, theme, service-judge mode, alerts, and language           |
 
 Pages are standalone Angular components and directly import the Ionic standalone components they use. Services are root-provided and injected with Angular's `inject()` function.
 
@@ -37,7 +37,7 @@ Persistence services use Dexie's `liveQuery()` and Angular's `toSignal()` to exp
 
 ## Persistence model
 
-`db.ts` declares a `CourtPilot` Dexie database at schema version 1.
+`db.ts` declares a `CourtPilot` Dexie database at schema version 2.
 
 ```mermaid
 erDiagram
@@ -84,6 +84,21 @@ valid preference exists. `ThemeService` restores the selection when the root
 component starts and toggles Ionic's `ion-palette-dark` class. Device theme changes
 apply while the app is open when device-preferred is selected. This does not
 change the Dexie schema or existing settings records.
+
+### Waiting-list quick buttons
+
+The optional waiting-list quick buttons default to disabled and require service
+judges. Disabling service judges disables this setting. Both waiting lists have
+an off-duty action; off-duty officials with a saved origin have a return action. Quick-button alerts
+apply to both actions. Dragging an official from either waiting list to Not on Duty
+also saves the origin, even when quick buttons are disabled. Returning appends to the saved role queue.
+
+Schema version 2 adds `waitingListQuickButtons` to settings and optional
+`returnToQueue` metadata to officials. The upgrade explicitly sets the setting to
+false for existing settings rows. Existing officials need no transformation;
+officials without return metadata have no return action. Queue indexes and
+existing records are preserved. Older application versions do not understand the
+new metadata; downgrading an IndexedDB database is not supported.
 
 ### Schema-change policy
 

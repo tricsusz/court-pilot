@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { signal } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { CourtServiceJudge, CourtUmpire, Settings, Umpire } from 'db';
+import { WaitingDutyService } from '../services/waiting-duty.service';
 import { Tab1Page } from './tab1.page';
 import { SettingsService } from '../services/settings-service';
 import { UmpireService } from '../services/umpire.service';
@@ -34,6 +36,7 @@ describe('Tab1Page court rotation', () => {
   let waitingJudge: jasmine.SpyObj<WaitingServiceJudgesService>;
   let umpireCourt: jasmine.SpyObj<CourtUmpireService>;
   let judgeCourt: jasmine.SpyObj<CourtServiceJudgeService>;
+  let duty: jasmine.SpyObj<WaitingDutyService>;
   let alerts: jasmine.SpyObj<AlertController>;
 
   beforeEach(() => {
@@ -72,6 +75,9 @@ describe('Tab1Page court rotation', () => {
       ['save', 'removeByUmpireId'],
       { umpires: courtJudges }
     );
+    duty = jasmine.createSpyObj('WaitingDutyService', ['move', 'moveToRest']);
+    duty.move.and.resolveTo();
+    duty.moveToRest.and.resolveTo();
     alerts = jasmine.createSpyObj('AlertController', ['create']);
     waitingUmpire.getCurrentUmpire.and.resolveTo(official(1));
     waitingJudge.getCurrentUmpire.and.resolveTo(official(2));
@@ -85,6 +91,7 @@ describe('Tab1Page court rotation', () => {
     judgeCourt.removeByUmpireId.and.resolveTo();
     TestBed.configureTestingModule({
       providers: [
+        { provide: WaitingDutyService, useValue: duty },
         { provide: SettingsService, useValue: { settings } },
         { provide: UmpireService, useValue: { umpires } },
         { provide: WaitingUmpiresService, useValue: waitingUmpire },
@@ -96,6 +103,74 @@ describe('Tab1Page court rotation', () => {
     });
     fixture = TestBed.createComponent(Tab1Page);
     component = fixture.componentInstance;
+  });
+
+  for (const source of [
+    'list-waiting-umpires',
+    'list-waiting-service-judges'
+  ]) {
+    it(`saves the waiting origin when dropped from ${source} to rest`, async () => {
+      await component.dropToRest({
+        previousContainer: { id: source },
+        container: { id: 'list-on-rest' },
+        item: { data: official(1) }
+      } as CdkDragDrop<Umpire[]>);
+      expect(duty.moveToRest).toHaveBeenCalledOnceWith(1);
+      expect(waitingUmpire.removeByUmpireId).not.toHaveBeenCalled();
+      expect(waitingJudge.removeByUmpireId).not.toHaveBeenCalled();
+    });
+  }
+
+  it('moves directly when quick-button alerts are disabled', async () => {
+    settings.update((value) => ({ ...value, waitingListQuickButtons: true }));
+    await component.changeWaitingDuty(official(1), true);
+    expect(duty.move).toHaveBeenCalledOnceWith(1, 'rest');
+    expect(alerts.create).not.toHaveBeenCalled();
+  });
+
+  it('ignores return actions without a saved origin', async () => {
+    settings.update((value) => ({
+      ...value,
+      waitingListQuickButtons: true,
+      showAlert: true
+    }));
+    await component.changeWaitingDuty(official(5), false);
+    expect(duty.move).not.toHaveBeenCalled();
+    expect(alerts.create).not.toHaveBeenCalled();
+  });
+
+  it('confirms returning to the saved service-judge queue', async () => {
+    settings.update((value) => ({
+      ...value,
+      waitingListQuickButtons: true,
+      showAlert: true
+    }));
+    alerts.create.and.resolveTo({
+      present: async () => undefined
+    } as unknown as HTMLIonAlertElement);
+    await component.changeWaitingDuty(
+      { ...official(5), returnToQueue: 'serviceJudge' },
+      false
+    );
+    expect(duty.move).not.toHaveBeenCalled();
+    const buttons = alerts.create.calls.mostRecent().args[0]?.buttons;
+    const confirm = buttons?.find(
+      (button) => typeof button !== 'string' && button.role === 'confirm'
+    );
+    if (typeof confirm === 'object' && typeof confirm.handler === 'function')
+      confirm.handler(undefined);
+    expect(duty.move).toHaveBeenCalledOnceWith(5, 'serviceJudge');
+  });
+
+  it('hides and ignores quick actions when service judges are disabled', async () => {
+    settings.update((value) => ({
+      ...value,
+      waitingListQuickButtons: true,
+      withServiceJudge: false
+    }));
+    expect(component.waitingQuickButtonsEnabled()).toBeFalse();
+    await component.changeWaitingDuty(official(1), true);
+    expect(duty.move).not.toHaveBeenCalled();
   });
 
   it('waits for confirmation before assigning officials', async () => {

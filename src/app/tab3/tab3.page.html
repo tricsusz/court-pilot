@@ -36,6 +36,21 @@
           </ion-item>
 
           <ion-item>
+            <div class="waiting-list-setting">
+              <ion-toggle
+                [checked]="currentSettings.waitingListQuickButtons ?? false"
+                [disabled]="!currentSettings.withServiceJudge"
+                aria-describedby="waiting-list-help"
+                (ionChange)="updateWaitingListQuickButtons($event)">
+                {{ 'waitingListQuickButtons' | translate }}
+              </ion-toggle>
+              <p id="waiting-list-help" class="setting-help">
+                {{ 'waitingListQuickButtonsHelp' | translate }}
+              </p>
+            </div>
+          </ion-item>
+
+          <ion-item>
             <ion-toggle
               [checked]="currentSettings.showAlert"
               (ionChange)="updateShowAlert($event)">

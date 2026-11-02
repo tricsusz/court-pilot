@@ -161,6 +161,18 @@
               <ion-label>{{ umpire|fullname }}</ion-label>
             </div>
             <ion-label>{{ umpire|fullname }}</ion-label>
+            @if (waitingQuickButtonsEnabled()) {
+            <ion-button
+              class="waiting-duty-button"
+              size="small"
+              fill="solid"
+              [attr.aria-label]="('moveOffDuty' | translate) + ': ' + (umpire | fullname)"
+              [attr.title]="'moveOffDuty' | translate"
+              (pointerdown)="$event.stopPropagation()"
+              (click)="$event.stopPropagation(); changeWaitingDuty(umpire, true)">
+              <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
+            </ion-button>
+            }
           </div>
           }
         </ion-list>
@@ -179,6 +191,18 @@
               <ion-label>{{ umpire|fullname }}</ion-label>
             </div>
             <ion-label>{{ umpire|fullname }}</ion-label>
+            @if (waitingQuickButtonsEnabled()) {
+            <ion-button
+              class="waiting-duty-button"
+              size="small"
+              fill="solid"
+              [attr.aria-label]="('moveOffDuty' | translate) + ': ' + (umpire | fullname)"
+              [attr.title]="'moveOffDuty' | translate"
+              (pointerdown)="$event.stopPropagation()"
+              (click)="$event.stopPropagation(); changeWaitingDuty(umpire, true)">
+              <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
+            </ion-button>
+            }
           </div>
           }
         </ion-list>
@@ -198,6 +222,18 @@
               <ion-label>{{ umpire|fullname }}</ion-label>
             </div>
             <ion-label>{{ umpire|fullname }}</ion-label>
+            @if (waitingQuickButtonsEnabled() && umpire.returnToQueue) {
+            <ion-button
+              class="waiting-duty-button"
+              size="small"
+              fill="solid"
+              [attr.aria-label]="('returnToQueue' | translate) + ': ' + (umpire | fullname)"
+              [attr.title]="'returnToQueue' | translate"
+              (pointerdown)="$event.stopPropagation()"
+              (click)="$event.stopPropagation(); changeWaitingDuty(umpire, false)">
+              <ion-icon slot="icon-only" name="enter-outline"></ion-icon>
+            </ion-button>
+            }
           </div>
           }
         </ion-list>

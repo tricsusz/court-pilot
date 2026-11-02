@@ -1,0 +1,15 @@
+.waiting-list-setting {
+  width: 100%;
+  padding-block: 12px;
+
+  ion-toggle {
+    width: 100%;
+  }
+}
+
+.setting-help {
+  margin: 8px 0 0;
+  color: var(--ion-color-medium-shade);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}

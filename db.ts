@@ -1,5 +1,7 @@
 import Dexie, { type EntityTable } from 'dexie';
 
+export type WaitingRole = 'umpire' | 'serviceJudge';
+
 export interface Umpire {
   id: number;
   firstName: string;
@@ -7,6 +9,7 @@ export interface Umpire {
   country: string;
   gender: string;
   courtNo?: number;
+  returnToQueue?: WaitingRole;
 }
 
 export interface CourtUmpire {
@@ -38,6 +41,7 @@ export interface Settings {
   withServiceJudge: boolean;
   numberOfCourts: number;
   showAlert: boolean;
+  waitingListQuickButtons?: boolean;
 }
 
 const db = new Dexie('CourtPilot') as Dexie & {
@@ -57,5 +61,21 @@ db.version(1).stores({
   waitingUmpires: '++id, order, umpireId',
   waitingServiceJudges: '++id, order, serviceJudgeId'
 });
+
+db.version(2)
+  .stores({
+    umpires: '++id, lastName',
+    courtUmpires: '++id, courtNo, umpireId',
+    courtServiceJudges: '++id, courtNo, umpireId',
+    settings: '++id',
+    waitingUmpires: '++id, order, umpireId',
+    waitingServiceJudges: '++id, order, serviceJudgeId'
+  })
+  .upgrade(async (transaction) => {
+    await transaction
+      .table('settings')
+      .toCollection()
+      .modify({ waitingListQuickButtons: false });
+  });
 
 export { db };

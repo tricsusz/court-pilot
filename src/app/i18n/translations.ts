@@ -9,6 +9,14 @@ export const translations = {
     themeLight: 'Light',
     themeDark: 'Dark',
     themeSystem: 'Device-preferred',
+    waitingListQuickButtons: 'Quick buttons for waiting lists',
+    waitingListQuickButtonsHelp:
+      'Move waiting officials off duty and return them to the end of their previous list. Only officials with a saved list have a return button. Requires Service Judge to be enabled.',
+    moveOffDuty: 'Move off duty',
+    returnToQueue: 'Return to waiting list',
+    confirmMoveOffDuty: 'Move this official to Not on Duty?',
+    confirmReturnToQueue:
+      'Return this official to the bottom of the waiting list?',
     showAlerts: 'Show alerts on quick buttons',
     serviceJudge: 'Service Judge',
     language: 'Language',
@@ -62,6 +70,14 @@ export const translations = {
     themeLight: 'Világos',
     themeDark: 'Sötét',
     themeSystem: 'Eszközbeállítás szerint',
+    waitingListQuickButtons: 'Gyors gombok a várólistákhoz',
+    waitingListQuickButtonsHelp:
+      'A várakozó tisztségviselőket pihenőre küldheted, majd visszaküldheted őket az előző várólistájuk végére. A visszaküldés gomb csak mentett várólista esetén jelenik meg. Az Adogatásbíró beállítás bekapcsolása szükséges.',
+    moveOffDuty: 'Pihenőre küldés',
+    returnToQueue: 'Vissza a várólistára',
+    confirmMoveOffDuty: 'Pihenőre küldöd ezt a tisztségviselőt?',
+    confirmReturnToQueue:
+      'Visszaküldöd ezt a tisztségviselőt a várólista végére?',
     showAlerts: 'Figyelmeztetések megjelenítése a gyors gomboknál',
     serviceJudge: 'Adogatásbíró',
     language: 'Nyelv',

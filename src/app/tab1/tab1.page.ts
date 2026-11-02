@@ -22,6 +22,7 @@ import {
 import { SettingsService } from '../services/settings-service';
 import { UmpireService } from '../services/umpire.service';
 import { Umpire } from 'db';
+import { WaitingDutyService } from '../services/waiting-duty.service';
 import { WaitingUmpiresService } from '../services/waiting-umpires.service';
 import { WaitingServiceJudgesService } from '../services/waiting-service-judges.service';
 import { FullnamePipe } from '../fullname-pipe';
@@ -70,6 +71,8 @@ export class Tab1Page {
   constructor() {
     addIcons({ exitOutline, enterOutline });
   }
+
+  readonly waitingDutyService = inject(WaitingDutyService);
 
   readonly settingsService = inject(SettingsService);
   readonly umpireService = inject(UmpireService);
@@ -285,12 +288,53 @@ export class Tab1Page {
     return this.settings()?.withServiceJudge ?? false;
   });
 
-  dropToRest(event: CdkDragDrop<Umpire[]>) {
+  readonly waitingQuickButtonsEnabled = computed(
+    () =>
+      this.serviceJudgeEnabled() && !!this.settings()?.waitingListQuickButtons
+  );
+
+  async changeWaitingDuty(umpire: Umpire, toRest: boolean): Promise<void> {
+    if (!this.waitingQuickButtonsEnabled()) return;
+    const destination = toRest ? 'rest' : umpire.returnToQueue;
+    if (!destination) return;
+    const move = () => this.waitingDutyService.move(umpire.id, destination);
+    if (!this.settings()?.showAlert) {
+      await move();
+      return;
+    }
+    const alert = await this.alertController.create({
+      header: this.translationService.translate('confirmation'),
+      subHeader: this.translationService.translate(
+        toRest ? 'confirmMoveOffDuty' : 'confirmReturnToQueue'
+      ),
+      message: this.fullnamePipe.transform(umpire),
+      buttons: [
+        { text: this.translationService.translate('no'), role: 'cancel' },
+        {
+          text: this.translationService.translate('yes'),
+          role: 'confirm',
+          handler: () => {
+            void move();
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async dropToRest(event: CdkDragDrop<Umpire[]>): Promise<void> {
     if (event.previousContainer === event.container) {
       return;
     } else {
       const comingFrom = event.previousContainer.id;
       const umpireToMove = event.item.data;
+      if (
+        comingFrom === 'list-waiting-umpires' ||
+        comingFrom === 'list-waiting-service-judges'
+      ) {
+        await this.waitingDutyService.moveToRest(umpireToMove.id);
+        return;
+      }
       this.removeFromOriginalPlace(umpireToMove, comingFrom);
     }
   }

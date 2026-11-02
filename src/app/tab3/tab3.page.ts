@@ -99,6 +99,14 @@ export class Tab3Page {
     }
   }
 
+  async updateWaitingListQuickButtons(
+    event: CustomEvent<{ checked: boolean }>
+  ): Promise<void> {
+    await this.settingsService.update({
+      waitingListQuickButtons: event.detail.checked
+    });
+  }
+
   async updateShowAlert(event: CustomEvent): Promise<void> {
     await this.settingsService.update({
       showAlert: event.detail.checked

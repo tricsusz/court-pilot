@@ -29,7 +29,12 @@ export class SettingsService {
       return;
     }
 
-    await db.settings.update(1, changes);
+    await db.settings.update(1, {
+      ...changes,
+      ...(!(changes.withServiceJudge ?? current.withServiceJudge)
+        ? { waitingListQuickButtons: false }
+        : {})
+    });
   }
 
   private async ensureSettings() {
@@ -40,7 +45,8 @@ export class SettingsService {
         id: 1,
         numberOfCourts: 5,
         withServiceJudge: true,
-        showAlert: true
+        showAlert: true,
+        waitingListQuickButtons: false
       });
     }
   }
