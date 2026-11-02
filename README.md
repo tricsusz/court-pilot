@@ -38,49 +38,48 @@ For desktop development, also install:
 These commands target **Bash** (Linux, macOS, or Windows WSL). From fish,
 start `bash` first. Follow the [shell and NVM setup](docs/development.md#shell-and-nvm-setup)
 before continuing. If Bash NVM is missing, agents must ask permission before
-installing it. `.nvmrc` declares `lts/jod`:
+installing it. `.nvmrc` declares `lts/jod`.
+
+Initialize NVM once at the start of each Bash session, from the project root:
 
 ```bash
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm install lts/jod
-nvm use lts/jod && npm ci
+. "$NVM_DIR/nvm.sh" && nvm use
 ```
 
-Each npm command block loads Bash NVM explicitly and selects the required Node
-version, including in fresh noninteractive shells.
+On first setup, run `nvm install` after loading NVM if the required Node version
+is not installed. Stop if setup fails; do not use the system Node as a fallback.
+The commands below reuse this session. Repeat the setup when opening a new shell.
+
+Install the project dependencies:
+
+```bash
+npm ci
+```
 
 If Ionic CLI is not already installed:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm install --global @ionic/cli
+npm install --global @ionic/cli
 ```
 
 ## Web development
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm start
+npm start
 ```
 
 Build the Angular application:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm run build
+npm run build
 ```
 
 Run linting and tests:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm run lint
-nvm use lts/jod && npm test
+npm run lint
+npm test
 ```
 
 `npm test` starts Karma in its configured mode and may remain open in watch mode.
@@ -96,18 +95,14 @@ For VS Code, the recommended extension is `esbenp.prettier-vscode`. Use **Format
 The Tauri CLI is available through:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm run tauri -- <command>
+npm run tauri -- <command>
 ```
 
 For example:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm run tauri -- dev
-nvm use lts/jod && npm run tauri -- build
+npm run tauri -- dev
+npm run tauri -- build
 ```
 
 > Tauri development intentionally uses `http://localhost:8103`. The current `npm start` script does not explicitly select that port, so verify that Ionic is listening on `8103` when using `tauri dev`.

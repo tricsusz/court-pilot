@@ -90,7 +90,7 @@ Do not manually edit generated output or installed dependencies:
 
 - Node.js must use the `lts/jod` NVM alias, as declared in `.nvmrc`.
 - Documented commands target Bash on Linux, macOS, or Windows WSL. Use Bash explicitly for agent commands; fish's `nvm.fish` is unavailable in Bash.
-- Before every npm command, explicitly load Bash NVM and select Node in the same shell session: `export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"; . "$NVM_DIR/nvm.sh" && nvm use lts/jod && npm run build`. Do not rely on `.bashrc` loading in noninteractive shells or fall back to system Node.
+- Initialize Bash NVM once at the start of each shell session: `export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"; . "$NVM_DIR/nvm.sh" && nvm use` from the project root. `nvm use` reads `lts/jod` from `.nvmrc`. Reuse that initialized shell for subsequent npm commands. If a tool starts a fresh shell for each execution, initialize each new shell or use a persistent shell; environment changes do not carry between independent shells. Stop if initialization fails. Do not rely on `.bashrc` loading in noninteractive shells or fall back to system Node.
 - If `${NVM_DIR:-$HOME/.nvm}/nvm.sh` is missing, ask the user for permission before installing Bash NVM. Follow `docs/development.md#shell-and-nvm-setup` after approval. Keep existing fish NVM separate.
 - Install exact dependencies: `npm ci`
 - Start the Ionic development server: `npm start`

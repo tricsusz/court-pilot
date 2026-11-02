@@ -12,22 +12,19 @@ as the app rather than installing an older nested copy.
 
 These examples target Bash and run from the project root. Complete the
 [shell and NVM setup](development.md#shell-and-nvm-setup) first. Agents must ask
-permission before installing missing Bash NVM. Each npm block loads NVM explicitly.
+permission before installing missing Bash NVM. Initialize NVM once per Bash
+session as described there, then run the commands below in that same shell.
 
 Run the interactive test suite:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm test
+npm test
 ```
 
 Run the configured non-watching CI test mode:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm test -- --configuration=ci
+npm test -- --configuration=ci
 ```
 
 The test environment requires an available Chrome installation. Test coverage output, when enabled by the test runner, is written under `coverage/app/`.
@@ -35,9 +32,7 @@ The test environment requires an available Chrome installation. Test coverage ou
 Run the suite once in headless Chrome with a coverage report:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm test -- --watch=false --browsers=ChromeHeadless --code-coverage
+npm test -- --watch=false --browsers=ChromeHeadless --code-coverage
 ```
 
 If Chrome is not auto-detected, set `CHROME_BIN` to its executable path
@@ -53,17 +48,13 @@ spies and signals to isolate assignments, confirmation, and role swaps.
 Lint TypeScript and Angular templates:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm run lint
+npm run lint
 ```
 
 Build the production Angular application:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm run build
+npm run build
 ```
 
 Check Rust changes from the Tauri directory:

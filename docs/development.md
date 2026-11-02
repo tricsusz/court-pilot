@@ -27,18 +27,21 @@ NVM. After approval, follow the official
 Use the default `~/.nvm` location, or set `NVM_DIR` to your existing Bash NVM
 installation. Keep an existing fish installation separate.
 
-After NVM is installed, install the required Node release from the project root:
+Initialize NVM once at the start of each Bash session, from the project root:
 
 ```bash
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm install lts/jod
+. "$NVM_DIR/nvm.sh" && nvm use
 ```
 
-Every npm command block below explicitly loads NVM and selects `lts/jod`.
-This also works in noninteractive Bash sessions that do not load `.bashrc`.
-Run each block from the project root. Stop if loading NVM or selecting Node fails;
-do not fall back to the system Node version.
+`nvm use` reads the required `lts/jod` version from `.nvmrc`. On first setup,
+run `nvm install` after loading NVM if that version is not installed.
+Stop if loading NVM or selecting Node fails; do not fall back to system Node.
+
+Run the commands below in that initialized shell. Repeat setup for each new
+shell, including noninteractive shells that do not load `.bashrc`. Agents should
+reuse an initialized shell for subsequent npm commands; separate command
+executions do not necessarily share environment changes.
 
 Angular 22 requires TypeScript 6.0 and Node.js 22.22.3 or newer on the
 Node.js 22 line. If your installed `lts/jod` is older, run `nvm install lts/jod`
@@ -47,17 +50,13 @@ after loading Bash NVM.
 Install exact project dependencies with:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm ci
+npm ci
 ```
 
 If needed, install Ionic CLI globally:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm install --global @ionic/cli
+npm install --global @ionic/cli
 ```
 
 The committed `.nvmrc` uses the named `lts/jod` alias. Do not replace it with another Node release or add `.tool-versions` unless the team intentionally changes version-management tools.
@@ -71,17 +70,13 @@ Install Rust stable and the Tauri 2 prerequisites for your operating system. `sr
 Start the Ionic development server:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm start
+npm start
 ```
 
 Build the Angular application:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm run build
+npm run build
 ```
 
 The production web output is generated under `www/`. Do not edit that directory manually.
@@ -140,10 +135,8 @@ which proposes incompatible downgrades of Angular and the test tooling.
 Run Tauri commands through the npm script:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
-nvm use lts/jod && npm run tauri dev
-nvm use lts/jod && npm run tauri build
+npm run tauri dev
+npm run tauri build
 ```
 
 Tauri development intentionally expects the frontend at `http://localhost:8103`. `devUrl` tells Tauri where to connect, and `beforeDevCommand` runs `npm run ng -- serve --host=0.0.0.0 --port=8103` to serve the frontend on the matching port without opening a browser. This uses the project's Angular CLI and does not require a global Ionic CLI installation. Keep these settings aligned when changing Tauri or serve configuration.
@@ -158,12 +151,10 @@ load these values from `.env` files. Keep private keys and passwords outside the
 repository.
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh"
 export TAURI_SIGNING_PRIVATE_KEY="$HOME/.tauri/myapp.key"
 # For a key without a password:
 export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
-nvm use lts/jod && npm run tauri build
+npm run tauri build
 ```
 
 For a password-protected key, replace the empty-password export with a hidden
