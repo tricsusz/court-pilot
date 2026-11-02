@@ -214,11 +214,18 @@ GIT_EDITOR=true git tag v1.2.0
 
 Replace `1.2.0` with the confirmed release version and verify the tag points to the intended commit. Do not overwrite or move an existing release tag.
 
-Creating the tag is local. Pushing it starts `.github/workflows/release.yml`, which builds Windows and macOS artifacts for CrabNebula and builds/publishes the Linux Snap. Push only after explicit confirmation:
+Creating the tag is local. Pushing it starts `.github/workflows/release.yml`, which builds Windows and macOS artifacts for CrabNebula and builds/publishes the Linux Snap. After CrabNebula publication succeeds, it also creates a GitHub Release for the pushed tag with generated release notes and attaches the Windows installers, both macOS DMGs, and the Linux Snap. Push only after explicit confirmation:
 
 ```sh
 git push origin v1.2.0
 ```
+
+The GitHub Release job uses the built-in `GITHUB_TOKEN` with job-scoped
+`contents: write` permission; no additional secret is required. Existing
+CrabNebula, updater-signing, and Snap Store secrets are still required. Manual
+workflow runs on branches skip the GitHub Release job; runs on `v*` tags include
+it. Use a new version tag for each release: creation fails if a GitHub Release
+already exists for that tag.
 
 ## Generated and local directories
 
