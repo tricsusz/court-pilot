@@ -4,11 +4,11 @@ const angular = require('angular-eslint');
 module.exports = defineConfig(
   { ignores: ['projects/**', 'www/**', 'coverage/**'] },
   {
-    files: ['src/**/*.ts'],
+    files: ['src/**/*.ts', 'db.ts'],
     extends: angular.configs.tsRecommended,
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.json'],
+        project: ['./tsconfig.eslint.json'],
         tsconfigRootDir: __dirname
       }
     },
