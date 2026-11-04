@@ -19,6 +19,7 @@ import {
   IonButton,
   AlertController
 } from '@ionic/angular';
+import { CourtRotationService } from '../services/court-rotation.service';
 import { SettingsService } from '../services/settings-service';
 import { UmpireService } from '../services/umpire.service';
 import { Umpire } from 'db';
@@ -82,8 +83,10 @@ export class Tab1Page {
   readonly courtServiceJudgeService = inject(CourtServiceJudgeService);
   readonly translationService = inject(TranslationService);
 
-  private alertController = inject(AlertController);
-  private fullnamePipe = inject(FullnamePipe);
+  readonly rotationService = inject(CourtRotationService);
+
+  private readonly alertController = inject(AlertController);
+  private readonly fullnamePipe = inject(FullnamePipe);
 
   /**
    * Raw signals from services
@@ -313,125 +316,76 @@ export class Tab1Page {
         {
           text: this.translationService.translate('yes'),
           role: 'confirm',
-          handler: () => {
-            void move();
-          }
+          handler: () => move()
         }
       ]
     });
     await alert.present();
   }
 
-  async dropToRest(event: CdkDragDrop<Umpire[]>): Promise<void> {
-    if (event.previousContainer === event.container) {
-      return;
+  async dropToRest(
+    event: CdkDragDrop<Umpire[], Umpire[], Umpire>
+  ): Promise<void> {
+    if (event.previousContainer === event.container) return;
+    const source = event.previousContainer.id;
+    if (
+      source === 'list-waiting-umpires' ||
+      source === 'list-waiting-service-judges'
+    ) {
+      await this.waitingDutyService.moveToRest(event.item.data.id);
     } else {
-      const comingFrom = event.previousContainer.id;
-      const umpireToMove = event.item.data;
-      if (
-        comingFrom === 'list-waiting-umpires' ||
-        comingFrom === 'list-waiting-service-judges'
-      ) {
-        await this.waitingDutyService.moveToRest(umpireToMove.id);
-        return;
-      }
-      this.removeFromOriginalPlace(umpireToMove, comingFrom);
+      await this.rotationService.moveToRest(event.item.data.id);
     }
   }
 
-  dropToWaitingServiceJudge(event: CdkDragDrop<Umpire[]>) {
-    const umpireToMove = event.item.data;
-    if (event.previousContainer === event.container) {
-      this.waitingServiceJudgeService.moveToPosition(
-        umpireToMove.id,
-        event.currentIndex + 1
-      );
-      return;
-    }
-    const comingFrom = event.previousContainer.id;
-
-    this.waitingServiceJudgeService.add(
-      umpireToMove.id,
+  async dropToWaitingServiceJudge(
+    event: CdkDragDrop<Umpire[], Umpire[], Umpire>
+  ): Promise<void> {
+    await this.rotationService.moveToQueue(
+      event.item.data.id,
+      'serviceJudge',
       event.currentIndex + 1
     );
-
-    this.removeFromOriginalPlace(umpireToMove, comingFrom);
   }
 
-  dropToWaitingUmpire(event: CdkDragDrop<Umpire[]>) {
-    const umpireToMove = event.item.data;
-    if (event.previousContainer === event.container) {
-      this.waitingUmpireService.moveToPosition(
-        umpireToMove.id,
-        event.currentIndex + 1
-      );
-      return;
-    } else {
-      const comingFrom = event.previousContainer.id;
-      this.waitingUmpireService.add(umpireToMove.id, event.currentIndex + 1);
-
-      this.removeFromOriginalPlace(umpireToMove, comingFrom);
-    }
+  async dropToWaitingUmpire(
+    event: CdkDragDrop<Umpire[], Umpire[], Umpire>
+  ): Promise<void> {
+    await this.rotationService.moveToQueue(
+      event.item.data.id,
+      'umpire',
+      event.currentIndex + 1
+    );
   }
 
-  dropToUmpire(event: CdkDragDrop<(Umpire | undefined)[]>, courtNo: number) {
-    const targetUmpires = event.container.data;
-
-    if (targetUmpires.length > 0) {
-      return;
-    }
-
-    const comingFrom = event.previousContainer.id;
-    const umpireToMove = event.item.data;
-    this.courtUmpireService.save({ umpireId: umpireToMove.id, courtNo });
-
-    this.removeFromOriginalPlace(umpireToMove, comingFrom);
-  }
-
-  dropToServiceJudge(
-    event: CdkDragDrop<(Umpire | undefined)[]>,
+  async dropToUmpire(
+    event: CdkDragDrop<(Umpire | undefined)[], unknown, Umpire>,
     courtNo: number
-  ) {
-    const targetUmpires = event.container.data;
-
-    if (targetUmpires.length > 0) {
-      return;
-    }
-
-    const comingFrom = event.previousContainer.id;
-    const umpireToMove = event.item.data;
-    this.courtServiceJudgeService.save({ umpireId: umpireToMove.id, courtNo });
-
-    this.removeFromOriginalPlace(umpireToMove, comingFrom);
+  ): Promise<void> {
+    if (event.container.data.length) return;
+    await this.rotationService.moveToCourt(
+      event.item.data.id,
+      'umpire',
+      courtNo
+    );
   }
 
-  private removeFromOriginalPlace(
-    umpireToMove: Umpire,
-    comingFrom: string
-  ): void {
-    if ('list-waiting-service-judges' === comingFrom) {
-      this.waitingServiceJudgeService.removeByUmpireId(umpireToMove.id);
-    }
-
-    if ('list-waiting-umpires' === comingFrom) {
-      this.waitingUmpireService.removeByUmpireId(umpireToMove.id);
-    }
-
-    if (comingFrom.startsWith('court-umpire')) {
-      this.courtUmpireService.removeByUmpireId(umpireToMove.id);
-    }
-
-    if (comingFrom.startsWith('court-service-judge')) {
-      this.courtServiceJudgeService.removeByUmpireId(umpireToMove.id);
-    }
+  async dropToServiceJudge(
+    event: CdkDragDrop<(Umpire | undefined)[], unknown, Umpire>,
+    courtNo: number
+  ): Promise<void> {
+    if (event.container.data.length) return;
+    await this.rotationService.moveToCourt(
+      event.item.data.id,
+      'serviceJudge',
+      courtNo
+    );
   }
 
-  canDropUmpire = (
-    drag: CdkDrag<Umpire>,
-    drop: CdkDropList<Umpire[]>
-  ): boolean => {
-    return drop.data.length === 0;
-  };
+  readonly canDropUmpire = (
+    _drag: CdkDrag<Umpire>,
+    drop: CdkDropList<(Umpire | undefined)[]>
+  ): boolean => drop.data.length === 0;
 
   public async showRemoveConfirmation(courtNo: number) {
     const umpire = this.umpireByCourt().get(courtNo);
@@ -445,7 +399,7 @@ export class Tab1Page {
     }
 
     if (!this.settings()?.showAlert) {
-      this.removeUmpiresFromCourt(courtNo);
+      await this.rotationService.rotate(courtNo, umpire.id, serviceJudge?.id);
       return;
     }
 
@@ -472,14 +426,8 @@ export class Tab1Page {
         {
           text: this.translationService.translate('yes'),
           role: 'confirm',
-          handler: () => {
-            if (this.serviceJudgeEnabled()) {
-              this.removeUmpiresFromCourt(courtNo);
-              return;
-            }
-
-            this.removeUmpireFromCourt(courtNo);
-          }
+          handler: () =>
+            this.rotationService.rotate(courtNo, umpire.id, serviceJudge?.id)
         }
       ]
     });
@@ -487,41 +435,11 @@ export class Tab1Page {
     await alert.present();
   }
 
-  /**
-   * This is for removing both umpire and service judge from the court (when service judge is enabled).
-   */
-  private async removeUmpiresFromCourt(courtNo: number) {
-    const umpire = this.umpireByCourt().get(courtNo);
-    const serviceJudge = this.serviceJudgeByCourt().get(courtNo);
-
-    if (typeof umpire === 'undefined' || typeof serviceJudge === 'undefined') {
-      return;
-    }
-
-    await this.courtUmpireService.removeByUmpireId(umpire.id);
-    await this.courtServiceJudgeService.removeByUmpireId(serviceJudge.id);
-    await this.waitingUmpireService.add(serviceJudge.id);
-    await this.waitingServiceJudgeService.add(umpire.id);
-  }
-
-  /**
-   * This is for removing 1 umpire only (when service judge is not enabled).
-   */
-  private async removeUmpireFromCourt(courtNo: number) {
-    const umpire = this.umpireByCourt().get(courtNo);
-
-    if (typeof umpire === 'undefined') {
-      return;
-    }
-
-    await this.courtUmpireService.removeByUmpireId(umpire.id);
-    await this.waitingUmpireService.add(umpire.id);
-  }
-
   public async showAddConfirmation(courtNo: number) {
     const umpire = await this.waitingUmpireService.getCurrentUmpire();
-    const serviceJudge =
-      await this.waitingServiceJudgeService.getCurrentUmpire();
+    const serviceJudge = this.serviceJudgeEnabled()
+      ? await this.waitingServiceJudgeService.getCurrentUmpire()
+      : undefined;
 
     if (
       typeof umpire === 'undefined' ||
@@ -531,16 +449,16 @@ export class Tab1Page {
     }
 
     if (!this.settings()?.showAlert) {
-      if (this.serviceJudgeEnabled() && serviceJudge) {
-        this.addUmpiresToCourt(courtNo, umpire, serviceJudge);
-        return;
-      }
-      this.addUmpireToCourt(courtNo, umpire);
+      await this.rotationService.assignNext(
+        courtNo,
+        umpire.id,
+        serviceJudge?.id
+      );
       return;
     }
 
     const alert = await this.alertController.create({
-      header: this.translationService.translate('court', {
+      header: this.translationService.translate('courtConfirm', {
         courtNo
       }),
 
@@ -566,37 +484,16 @@ export class Tab1Page {
         {
           text: this.translationService.translate('yes'),
           role: 'confirm',
-          handler: () => {
-            if (this.serviceJudgeEnabled() && serviceJudge) {
-              this.addUmpiresToCourt(courtNo, umpire, serviceJudge);
-            } else {
-              this.addUmpireToCourt(courtNo, umpire);
-            }
-          }
+          handler: () =>
+            this.rotationService.assignNext(
+              courtNo,
+              umpire.id,
+              serviceJudge?.id
+            )
         }
       ]
     });
 
     await alert.present();
-  }
-
-  private async addUmpiresToCourt(
-    courtNo: number,
-    umpire: Umpire,
-    serviceJudge: Umpire
-  ) {
-    await this.courtUmpireService.save({ courtNo, umpireId: umpire.id });
-    await this.courtServiceJudgeService.save({
-      courtNo,
-      umpireId: serviceJudge.id
-    });
-
-    await this.waitingUmpireService.removeByUmpireId(umpire.id);
-    await this.waitingServiceJudgeService.removeByUmpireId(serviceJudge.id);
-  }
-
-  private async addUmpireToCourt(courtNo: number, umpire: Umpire) {
-    await this.courtUmpireService.save({ courtNo, umpireId: umpire.id });
-    await this.waitingUmpireService.removeByUmpireId(umpire.id);
   }
 }

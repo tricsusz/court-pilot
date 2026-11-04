@@ -10,7 +10,7 @@ import { TranslationService } from './i18n/translation.service';
 export class FullnamePipe implements PipeTransform {
   readonly translationService = inject(TranslationService);
 
-  transform(value: Umpire | undefined, ...args: unknown[]): string {
+  transform(value: Umpire | undefined): string {
     if (typeof value === 'undefined') {
       return '';
     }

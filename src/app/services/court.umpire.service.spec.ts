@@ -15,6 +15,11 @@ describe('CourtUmpireService persistence', () => {
     await db.courtUmpires.clear();
   });
 
+  it('creates a reactive court lookup outside an injection context', () => {
+    const assignment = service.getByCourtNo(1);
+    expect(assignment()).toBeUndefined();
+  });
+
   it('saves an assignment and returns its generated ID', async () => {
     const id = await service.save({ umpireId: 10, courtNo: 2 });
     expect(await db.courtUmpires.get(id)).toEqual({

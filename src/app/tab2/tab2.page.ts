@@ -28,7 +28,6 @@ import { UmpireService } from '../services/umpire.service';
 import { Umpire } from 'db';
 import { addIcons } from 'ionicons';
 import { add, trash } from 'ionicons/icons';
-import { OverlayEventDetail } from '@ionic/core/components';
 import { FormsModule } from '@angular/forms';
 import { FullnamePipe } from '../fullname-pipe';
 import { TranslatePipe } from '../i18n/translation.pipe';
@@ -75,12 +74,14 @@ export class Tab2Page {
 
   public readonly umpires = this.umpireService.umpires;
 
+  saving = false;
+
   public lastName: string = '';
   public firstName: string = '';
   public country: string = '';
   public gender: string = '';
 
-  public genders: { label: TranslationKey; code: string }[] = [
+  public readonly genders: { label: TranslationKey; code: string }[] = [
     { label: 'male', code: 'M' },
     { label: 'female', code: 'W' }
   ];
@@ -89,36 +90,32 @@ export class Tab2Page {
     addIcons({ add, trash });
   }
 
-  public async onWillDismiss(event: CustomEvent<OverlayEventDetail>) {
-    if (event.detail.role !== 'confirm') {
-      return;
-    }
-
-    const newUmpire: Umpire = event.detail.data;
-
-    await this.umpireService.create({
-      firstName: newUmpire.firstName,
-      lastName: newUmpire.lastName,
-      country: newUmpire.country,
-      gender: newUmpire.gender
-    });
+  cancel(): Promise<boolean> {
+    return this.modal.dismiss(null, 'cancel');
   }
 
-  cancel() {
-    this.modal.dismiss(null, 'cancel');
-  }
-
-  async confirm() {
-    await this.modal.dismiss(
-      {
-        lastName: this.lastName,
-        firstName: this.firstName,
-        country: this.country,
+  async confirm(): Promise<void> {
+    if (this.saving || !this.isValidUmpire()) return;
+    this.saving = true;
+    try {
+      await this.umpireService.create({
+        lastName: this.lastName.trim(),
+        firstName: this.firstName.trim(),
+        country: this.country.trim(),
         gender: this.gender
-      },
-      'confirm'
-    );
-
+      });
+    } catch (error) {
+      console.error('Failed to save court official:', error);
+      const alert = await this.alertController.create({
+        header: this.translationService.translate('saveFailed'),
+        buttons: ['OK']
+      });
+      await alert.present();
+      return;
+    } finally {
+      this.saving = false;
+    }
+    await this.modal.dismiss(null, 'confirm');
     this.lastName = '';
     this.firstName = '';
     this.country = '';
@@ -126,7 +123,7 @@ export class Tab2Page {
   }
 
   isValidUmpire(): boolean {
-    return this.lastName !== '' && this.firstName !== '';
+    return this.lastName.trim().length > 0 && this.firstName.trim().length > 0;
   }
 
   public async showDeleteConfirmation(umpire: Umpire): Promise<void> {
@@ -142,18 +139,11 @@ export class Tab2Page {
         {
           text: this.translationService.translate('yes'),
           role: 'confirm',
-          handler: () => {
-            // TODO: also remove from first tab
-            this.removeUmpire(umpire);
-          }
+          handler: () => this.umpireService.delete(umpire.id)
         }
       ]
     });
 
     await alert.present();
-  }
-
-  private removeUmpire(umpire: Umpire): void {
-    this.umpireService.delete(umpire.id);
   }
 }

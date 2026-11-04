@@ -1,9 +1,4 @@
-import {
-  Component,
-  EnvironmentInjector,
-  inject,
-  ChangeDetectionStrategy
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import {
   IonTabs,
   IonTabBar,
@@ -23,8 +18,6 @@ import { TranslatePipe } from '../i18n/translation.pipe';
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, TranslatePipe]
 })
 export class TabsPage {
-  public environmentInjector = inject(EnvironmentInjector);
-
   constructor() {
     addIcons({ gridOutline, peopleOutline, settingsOutline });
   }

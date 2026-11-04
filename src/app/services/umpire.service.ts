@@ -1,14 +1,18 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { db } from 'db';
 import { liveQuery } from 'dexie';
 import { from } from 'rxjs';
-import { Umpire } from '../../../db';
+import { Umpire } from 'db';
+import { WaitingUmpiresService } from './waiting-umpires.service';
+import { WaitingServiceJudgesService } from './waiting-service-judges.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UmpireService {
+  private readonly waitingUmpires = inject(WaitingUmpiresService);
+  private readonly waitingJudges = inject(WaitingServiceJudgesService);
   /**
    * Reactive signal with all umpires
    */
@@ -23,9 +27,7 @@ export class UmpireService {
    * Create
    */
   async create(umpire: Omit<Umpire, 'id'>): Promise<number> {
-    return await db.umpires.add({
-      ...umpire
-    } as Umpire);
+    return db.umpires.add({ ...umpire });
   }
 
   /**
@@ -49,13 +51,50 @@ export class UmpireService {
    * Delete
    */
   async delete(id: number): Promise<void> {
-    await db.umpires.delete(id);
+    await db.transaction(
+      'rw',
+      [
+        db.umpires,
+        db.waitingUmpires,
+        db.waitingServiceJudges,
+        db.courtUmpires,
+        db.courtServiceJudges
+      ],
+      async () => {
+        await db.waitingUmpires.where('umpireId').equals(id).delete();
+        await db.waitingServiceJudges
+          .where('serviceJudgeId')
+          .equals(id)
+          .delete();
+        await db.courtUmpires.where('umpireId').equals(id).delete();
+        await db.courtServiceJudges.where('umpireId').equals(id).delete();
+        await this.waitingUmpires.reinitOrders();
+        await this.waitingJudges.reinitOrders();
+        await db.umpires.delete(id);
+      }
+    );
   }
 
   /**
    * Delete all
    */
   async clear(): Promise<void> {
-    await db.umpires.clear();
+    await db.transaction(
+      'rw',
+      [
+        db.umpires,
+        db.waitingUmpires,
+        db.waitingServiceJudges,
+        db.courtUmpires,
+        db.courtServiceJudges
+      ],
+      async () => {
+        await db.waitingUmpires.clear();
+        await db.waitingServiceJudges.clear();
+        await db.courtUmpires.clear();
+        await db.courtServiceJudges.clear();
+        await db.umpires.clear();
+      }
+    );
   }
 }

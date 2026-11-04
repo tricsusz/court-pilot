@@ -1,11 +1,13 @@
 const { defineConfig } = require('eslint/config');
 const angular = require('angular-eslint');
+const typescript = require('@typescript-eslint/eslint-plugin');
 
 module.exports = defineConfig(
   { ignores: ['projects/**', 'www/**', 'coverage/**'] },
   {
     files: ['src/**/*.ts', 'db.ts'],
     extends: angular.configs.tsRecommended,
+    plugins: { '@typescript-eslint': typescript },
     languageOptions: {
       parserOptions: {
         project: ['./tsconfig.eslint.json'],
@@ -14,8 +16,14 @@ module.exports = defineConfig(
     },
     processor: angular.processInlineTemplates,
     rules: {
-      // Preserve existing Ionic page updates while retaining Zone.js.
+      // Ionic outlets and plain-field forms need eager change detection.
+      // https://ionicframework.com/docs/angular/lifecycle
       '@angular-eslint/prefer-on-push-component-change-detection': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' }
+      ],
+      '@typescript-eslint/no-explicit-any': 'error',
       '@angular-eslint/component-class-suffix': [
         'error',
         { suffixes: ['Page', 'Component'] }

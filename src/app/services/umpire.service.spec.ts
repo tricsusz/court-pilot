@@ -12,18 +12,31 @@ describe('UmpireService persistence', () => {
   };
 
   beforeEach(async () => {
-    await db.umpires.clear();
+    await Promise.all([
+      db.umpires.clear(),
+      db.waitingUmpires.clear(),
+      db.waitingServiceJudges.clear(),
+      db.courtUmpires.clear(),
+      db.courtServiceJudges.clear()
+    ]);
     service = TestBed.inject(UmpireService);
   });
 
   afterEach(async () => {
     TestBed.resetTestingModule();
-    await db.umpires.clear();
+    await Promise.all([
+      db.umpires.clear(),
+      db.waitingUmpires.clear(),
+      db.waitingServiceJudges.clear(),
+      db.courtUmpires.clear(),
+      db.courtServiceJudges.clear()
+    ]);
   });
 
   it('creates and retrieves a complete official record', async () => {
     const id = await service.create(official);
     expect(await service.getById(id)).toEqual({ ...official, id });
+    expect('id' in official).toBeFalse();
   });
 
   it('updates selected fields while retaining the rest of the record', async () => {
@@ -51,6 +64,28 @@ describe('UmpireService persistence', () => {
       firstName: 'Sam',
       id: retained
     });
+  });
+
+  it('deletes dependent duty records and closes the queue gap', async () => {
+    const id = await service.create(official);
+    const retained = await service.create({ ...official, firstName: 'Sam' });
+    await db.waitingUmpires.bulkAdd([
+      { umpireId: id, order: 1 },
+      { umpireId: retained, order: 2 }
+    ]);
+    await db.waitingServiceJudges.add({ serviceJudgeId: id, order: 1 });
+    await db.courtUmpires.add({ umpireId: id, courtNo: 1 });
+    await db.courtServiceJudges.add({ umpireId: id, courtNo: 2 });
+    await service.delete(id);
+    expect(
+      (await db.waitingUmpires.toArray()).map((item) => [
+        item.umpireId,
+        item.order
+      ])
+    ).toEqual([[retained, 1]]);
+    expect(await db.waitingServiceJudges.count()).toBe(0);
+    expect(await db.courtUmpires.count()).toBe(0);
+    expect(await db.courtServiceJudges.count()).toBe(0);
   });
 
   it('clears all officials', async () => {

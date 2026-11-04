@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { computed, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CourtUmpire, db } from 'db';
 import { liveQuery } from 'dexie';
@@ -20,9 +20,8 @@ export class CourtUmpireService {
    * Get by court number (reactive single)
    */
   getByCourtNo(courtNo: number) {
-    return toSignal<CourtUmpire | undefined>(
-      liveQuery(() => db.courtUmpires.where('courtNo').equals(courtNo).first()),
-      { initialValue: undefined }
+    return computed(() =>
+      this.umpires().find((item) => item.courtNo === courtNo)
     );
   }
 
@@ -30,7 +29,7 @@ export class CourtUmpireService {
    * Create / update
    */
   async save(item: Omit<CourtUmpire, 'id'>): Promise<number> {
-    return db.courtUmpires.add(item as CourtUmpire);
+    return db.courtUmpires.add({ ...item });
   }
 
   async update(id: number, changes: Partial<CourtUmpire>): Promise<number> {

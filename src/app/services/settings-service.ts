@@ -23,24 +23,46 @@ export class SettingsService {
    * Update settings
    */
   async update(changes: Partial<Omit<Settings, 'id'>>): Promise<void> {
-    const current = await db.settings.get(1);
-
-    if (!current) {
+    if (
+      changes.numberOfCourts !== undefined &&
+      (!Number.isSafeInteger(changes.numberOfCourts) ||
+        changes.numberOfCourts < 1)
+    )
       return;
-    }
 
-    await db.settings.update(1, {
-      ...changes,
-      ...(!(changes.withServiceJudge ?? current.withServiceJudge)
-        ? { waitingListQuickButtons: false }
-        : {})
-    });
+    await db.transaction(
+      'rw',
+      [
+        db.settings,
+        db.courtUmpires,
+        db.courtServiceJudges,
+        db.waitingServiceJudges
+      ],
+      async () => {
+        await this.ensureSettings();
+        const current = (await db.settings.get(1))!;
+        const next = { ...current, ...changes };
+        if (!next.withServiceJudge) next.waitingListQuickButtons = false;
+        await db.courtUmpires
+          .where('courtNo')
+          .above(next.numberOfCourts)
+          .delete();
+        await db.courtServiceJudges
+          .where('courtNo')
+          .above(next.numberOfCourts)
+          .delete();
+        if (!next.withServiceJudge) {
+          await db.courtServiceJudges.clear();
+          await db.waitingServiceJudges.clear();
+        }
+        await db.settings.put(next);
+      }
+    );
   }
 
   private async ensureSettings() {
-    const existing = await db.settings.get(1);
-
-    if (!existing) {
+    await db.transaction('rw', db.settings, async () => {
+      if (await db.settings.get(1)) return;
       await db.settings.put({
         id: 1,
         numberOfCourts: 5,
@@ -48,6 +70,6 @@ export class SettingsService {
         showAlert: true,
         waitingListQuickButtons: false
       });
-    }
+    });
   }
 }

@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { inject, Injectable, signal } from '@angular/core';
 import {
   translations,
   Language,
@@ -10,12 +11,21 @@ import {
   providedIn: 'root'
 })
 export class TranslationService {
+  private readonly document = inject(DOCUMENT);
   private readonly storageKey = 'language';
 
-  readonly language = signal<Language>(this.getInitialLanguage());
+  private readonly selectedLanguage = signal<Language>(
+    this.getInitialLanguage()
+  );
+  readonly language = this.selectedLanguage.asReadonly();
+
+  constructor() {
+    this.document.documentElement.lang = this.language();
+  }
 
   setLanguage(language: Language): void {
-    this.language.set(language);
+    this.selectedLanguage.set(language);
+    this.document.documentElement.lang = language;
     localStorage.setItem(this.storageKey, language);
   }
 
@@ -32,13 +42,13 @@ export class TranslationService {
   private getInitialLanguage(): Language {
     const stored = localStorage.getItem(this.storageKey);
 
-    if (stored && stored in translations) {
-      return stored as Language;
+    if (stored === 'en' || stored === 'hu') {
+      return stored;
     }
 
-    const browserLanguage = navigator.language.split('-')[0] as Language;
+    const browserLanguage = navigator.language.split('-')[0];
 
-    if (browserLanguage in translations) {
+    if (browserLanguage === 'en' || browserLanguage === 'hu') {
       return browserLanguage;
     }
 

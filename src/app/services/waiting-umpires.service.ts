@@ -22,31 +22,26 @@ export class WaitingUmpiresService {
    * Add new umpire to queue with max(order) + 1
    */
   async add(umpireId: number, toPosition?: number): Promise<number> {
-    const id = await db.transaction('rw', db.waitingUmpires, async () => {
+    return db.transaction('rw', db.waitingUmpires, async () => {
       const last = await db.waitingUmpires.orderBy('order').last();
-
-      const nextOrder = last ? last.order + 1 : 1;
-
-      return db.waitingUmpires.add({
+      const id = await db.waitingUmpires.add({
         umpireId,
-        order: nextOrder
+        order: last ? last.order + 1 : 1
       });
+      if (toPosition !== undefined)
+        await this.moveToPosition(umpireId, toPosition);
+      return id;
     });
-
-    if (toPosition !== undefined) {
-      await this.moveToPosition(umpireId, toPosition);
-    }
-
-    return id;
   }
 
   /**
    * Remove from queue
    */
   async remove(id: number): Promise<void> {
-    await db.waitingUmpires.delete(id);
-
-    await this.reinitOrders();
+    await db.transaction('rw', db.waitingUmpires, async () => {
+      await db.waitingUmpires.delete(id);
+      await this.reinitOrders();
+    });
   }
 
   async removeByUmpireId(umpireId: number): Promise<void> {
@@ -106,7 +101,7 @@ export class WaitingUmpiresService {
           .toArray();
 
         for (const item of affected) {
-          await db.waitingUmpires.update(item.id!, {
+          await db.waitingUmpires.update(item.id, {
             order: item.order + 1
           });
         }
@@ -123,13 +118,13 @@ export class WaitingUmpiresService {
           .toArray();
 
         for (const item of affected) {
-          await db.waitingUmpires.update(item.id!, {
+          await db.waitingUmpires.update(item.id, {
             order: item.order - 1
           });
         }
       }
 
-      await db.waitingUmpires.update(current.id!, {
+      await db.waitingUmpires.update(current.id, {
         order: newOrder
       });
     });
@@ -145,7 +140,7 @@ export class WaitingUmpiresService {
         const expectedOrder = i + 1;
 
         if (item.order !== expectedOrder) {
-          await db.waitingUmpires.update(item.id!, {
+          await db.waitingUmpires.update(item.id, {
             order: expectedOrder
           });
         }
@@ -154,7 +149,7 @@ export class WaitingUmpiresService {
   }
 
   async getCurrentUmpire(): Promise<Umpire | undefined> {
-    const item = await db.waitingUmpires.where('order').equals(1).first();
+    const item = await db.waitingUmpires.orderBy('order').first();
 
     return item ? db.umpires.get(item.umpireId) : undefined;
   }

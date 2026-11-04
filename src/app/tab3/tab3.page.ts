@@ -16,12 +16,13 @@ import {
   IonLabel
 } from '@ionic/angular';
 import { SettingsService } from '../services/settings-service';
-import { CourtUmpireService } from '../services/court.umpire.service';
-import { CourtServiceJudgeService } from '../services/court.service.judge.service';
-import { CourtServiceJudge } from 'db';
-import { WaitingServiceJudgesService } from '../services/waiting-service-judges.service';
 import { TranslationService } from '../i18n/translation.service';
 import { Language } from '../i18n/translations';
+import type {
+  InputCustomEvent,
+  SelectCustomEvent,
+  ToggleCustomEvent
+} from '@ionic/angular';
 import { TranslatePipe } from '../i18n/translation.pipe';
 import { ThemePreference, ThemeService } from '../services/theme.service';
 
@@ -50,74 +51,41 @@ import { ThemePreference, ThemeService } from '../services/theme.service';
 })
 export class Tab3Page {
   readonly settingsService = inject(SettingsService);
-  readonly courtUmpireService = inject(CourtUmpireService);
-  readonly courtServiceJudgeService = inject(CourtServiceJudgeService);
-  readonly waitingServiceJudgeService = inject(WaitingServiceJudgesService);
   readonly translationService = inject(TranslationService);
 
   readonly themeService = inject(ThemeService);
 
   readonly settings = this.settingsService.settings;
 
-  async updateNumberOfCourts(event: CustomEvent): Promise<void> {
-    this.courtUmpireService
-      .umpires()
-      .filter((cu) => {
-        return cu.courtNo > Number(event.detail.value);
-      })
-      .map((cu) => {
-        this.courtUmpireService.delete(cu.id);
-      });
-
-    this.courtServiceJudgeService
-      .umpires()
-      .filter((cu) => {
-        return cu.courtNo > Number(event.detail.value);
-      })
-      .map((cu) => {
-        this.courtServiceJudgeService.delete(cu.id);
-      });
-
+  async updateNumberOfCourts(event: InputCustomEvent): Promise<void> {
     await this.settingsService.update({
       numberOfCourts: Number(event.detail.value)
     });
   }
 
-  async updateWithServiceJudge(event: CustomEvent): Promise<void> {
+  async updateWithServiceJudge(event: ToggleCustomEvent): Promise<void> {
     await this.settingsService.update({
       withServiceJudge: event.detail.checked
     });
-
-    if (!event.detail.checked) {
-      this.courtServiceJudgeService.umpires().map((csj: CourtServiceJudge) => {
-        this.courtServiceJudgeService.delete(csj.id);
-      });
-
-      this.waitingServiceJudgeService.waitingServiceJudges().map((wsj) => {
-        this.waitingServiceJudgeService.remove(wsj.id);
-      });
-    }
   }
 
-  async updateWaitingListQuickButtons(
-    event: CustomEvent<{ checked: boolean }>
-  ): Promise<void> {
+  async updateWaitingListQuickButtons(event: ToggleCustomEvent): Promise<void> {
     await this.settingsService.update({
       waitingListQuickButtons: event.detail.checked
     });
   }
 
-  async updateShowAlert(event: CustomEvent): Promise<void> {
+  async updateShowAlert(event: ToggleCustomEvent): Promise<void> {
     await this.settingsService.update({
       showAlert: event.detail.checked
     });
   }
 
-  updateTheme(event: CustomEvent<{ value: ThemePreference }>): void {
+  updateTheme(event: SelectCustomEvent<ThemePreference>): void {
     this.themeService.setTheme(event.detail.value);
   }
 
-  updateLanguage(event: CustomEvent): void {
-    this.translationService.setLanguage(event.detail.value as Language);
+  updateLanguage(event: SelectCustomEvent<Language>): void {
+    this.translationService.setLanguage(event.detail.value);
   }
 }

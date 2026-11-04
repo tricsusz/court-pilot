@@ -4,6 +4,7 @@ import { signal } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { CourtServiceJudge, CourtUmpire, Settings, Umpire } from 'db';
 import { WaitingDutyService } from '../services/waiting-duty.service';
+import { CourtRotationService } from '../services/court-rotation.service';
 import { Tab1Page } from './tab1.page';
 import { SettingsService } from '../services/settings-service';
 import { UmpireService } from '../services/umpire.service';
@@ -37,6 +38,7 @@ describe('Tab1Page court rotation', () => {
   let umpireCourt: jasmine.SpyObj<CourtUmpireService>;
   let judgeCourt: jasmine.SpyObj<CourtServiceJudgeService>;
   let duty: jasmine.SpyObj<WaitingDutyService>;
+  let rotation: jasmine.SpyObj<CourtRotationService>;
   let alerts: jasmine.SpyObj<AlertController>;
 
   beforeEach(() => {
@@ -78,6 +80,15 @@ describe('Tab1Page court rotation', () => {
     duty = jasmine.createSpyObj('WaitingDutyService', ['move', 'moveToRest']);
     duty.move.and.resolveTo();
     duty.moveToRest.and.resolveTo();
+    rotation = jasmine.createSpyObj('CourtRotationService', [
+      'assignNext',
+      'rotate',
+      'moveToQueue',
+      'moveToCourt',
+      'moveToRest'
+    ]);
+    rotation.assignNext.and.resolveTo();
+    rotation.rotate.and.resolveTo();
     alerts = jasmine.createSpyObj('AlertController', ['create']);
     waitingUmpire.getCurrentUmpire.and.resolveTo(official(1));
     waitingJudge.getCurrentUmpire.and.resolveTo(official(2));
@@ -91,6 +102,7 @@ describe('Tab1Page court rotation', () => {
     judgeCourt.removeByUmpireId.and.resolveTo();
     TestBed.configureTestingModule({
       providers: [
+        { provide: CourtRotationService, useValue: rotation },
         { provide: WaitingDutyService, useValue: duty },
         { provide: SettingsService, useValue: { settings } },
         { provide: UmpireService, useValue: { umpires } },
@@ -179,7 +191,7 @@ describe('Tab1Page court rotation', () => {
     alerts.create.and.resolveTo({ present } as unknown as HTMLIonAlertElement);
     await component.showAddConfirmation(2);
     expect(present).toHaveBeenCalledTimes(1);
-    expect(umpireCourt.save).not.toHaveBeenCalled();
+    expect(rotation.assignNext).not.toHaveBeenCalled();
     expect(judgeCourt.save).not.toHaveBeenCalled();
     const options = alerts.create.calls.mostRecent().args[0];
     const confirm = options?.buttons?.find(
@@ -190,14 +202,7 @@ describe('Tab1Page court rotation', () => {
       confirm.handler(undefined);
     }
     await fixture.whenStable();
-    expect(umpireCourt.save).toHaveBeenCalledOnceWith({
-      courtNo: 2,
-      umpireId: 1
-    });
-    expect(judgeCourt.save).toHaveBeenCalledOnceWith({
-      courtNo: 2,
-      umpireId: 2
-    });
+    expect(rotation.assignNext).toHaveBeenCalledOnceWith(2, 1, 2);
   });
 
   it('returns a lone umpire to the umpire queue after confirming rotation', async () => {
@@ -210,7 +215,7 @@ describe('Tab1Page court rotation', () => {
     const present = jasmine.createSpy('present').and.resolveTo();
     alerts.create.and.resolveTo({ present } as unknown as HTMLIonAlertElement);
     await component.showRemoveConfirmation(2);
-    expect(umpireCourt.removeByUmpireId).not.toHaveBeenCalled();
+    expect(rotation.rotate).not.toHaveBeenCalled();
     const options = alerts.create.calls.mostRecent().args[0];
     const confirm = options?.buttons?.find(
       (button) => typeof button !== 'string' && button.role === 'confirm'
@@ -220,32 +225,20 @@ describe('Tab1Page court rotation', () => {
       confirm.handler(undefined);
     }
     await fixture.whenStable();
-    expect(umpireCourt.removeByUmpireId).toHaveBeenCalledOnceWith(3);
-    expect(waitingUmpire.add).toHaveBeenCalledOnceWith(3);
-    expect(waitingJudge.add).not.toHaveBeenCalled();
-    expect(judgeCourt.removeByUmpireId).not.toHaveBeenCalled();
+    expect(rotation.rotate).toHaveBeenCalledOnceWith(2, 3, undefined);
   });
 
   it('assigns both queue heads and removes them from their queues', async () => {
     await component.showAddConfirmation(3);
     await fixture.whenStable();
-    expect(umpireCourt.save).toHaveBeenCalledOnceWith({
-      courtNo: 3,
-      umpireId: 1
-    });
-    expect(judgeCourt.save).toHaveBeenCalledOnceWith({
-      courtNo: 3,
-      umpireId: 2
-    });
-    expect(waitingUmpire.removeByUmpireId).toHaveBeenCalledOnceWith(1);
-    expect(waitingJudge.removeByUmpireId).toHaveBeenCalledOnceWith(2);
+    expect(rotation.assignNext).toHaveBeenCalledOnceWith(3, 1, 2);
     expect(alerts.create).not.toHaveBeenCalled();
   });
 
   it('does not assign either role when the required service judge is missing', async () => {
     waitingJudge.getCurrentUmpire.and.resolveTo(undefined);
     await component.showAddConfirmation(1);
-    expect(umpireCourt.save).not.toHaveBeenCalled();
+    expect(rotation.assignNext).not.toHaveBeenCalled();
     expect(judgeCourt.save).not.toHaveBeenCalled();
     expect(waitingUmpire.removeByUmpireId).not.toHaveBeenCalled();
   });
@@ -253,7 +246,7 @@ describe('Tab1Page court rotation', () => {
   it('does not assign when the umpire queue is empty', async () => {
     waitingUmpire.getCurrentUmpire.and.resolveTo(undefined);
     await component.showAddConfirmation(1);
-    expect(umpireCourt.save).not.toHaveBeenCalled();
+    expect(rotation.assignNext).not.toHaveBeenCalled();
     expect(judgeCourt.save).not.toHaveBeenCalled();
   });
 
@@ -261,13 +254,8 @@ describe('Tab1Page court rotation', () => {
     settings.update((value) => ({ ...value, withServiceJudge: false }));
     await component.showAddConfirmation(2);
     await fixture.whenStable();
-    expect(umpireCourt.save).toHaveBeenCalledOnceWith({
-      courtNo: 2,
-      umpireId: 1
-    });
-    expect(waitingUmpire.removeByUmpireId).toHaveBeenCalledOnceWith(1);
-    expect(judgeCourt.save).not.toHaveBeenCalled();
-    expect(waitingJudge.removeByUmpireId).not.toHaveBeenCalled();
+    expect(rotation.assignNext).toHaveBeenCalledOnceWith(2, 1, undefined);
+    expect(waitingJudge.getCurrentUmpire).not.toHaveBeenCalled();
   });
 
   it('swaps outgoing officials into the opposite role queues', async () => {
@@ -275,17 +263,21 @@ describe('Tab1Page court rotation', () => {
     courtJudges.set([{ id: 1, umpireId: 4, courtNo: 2 }]);
     await component.showRemoveConfirmation(2);
     await fixture.whenStable();
-    expect(umpireCourt.removeByUmpireId).toHaveBeenCalledOnceWith(3);
-    expect(judgeCourt.removeByUmpireId).toHaveBeenCalledOnceWith(4);
-    expect(waitingUmpire.add).toHaveBeenCalledOnceWith(4);
-    expect(waitingJudge.add).toHaveBeenCalledOnceWith(3);
+    expect(rotation.rotate).toHaveBeenCalledOnceWith(2, 3, 4);
   });
 
   it('leaves an incomplete court unchanged when service judges are required', async () => {
     courtUmpires.set([{ id: 1, umpireId: 3, courtNo: 2 }]);
     await component.showRemoveConfirmation(2);
-    expect(umpireCourt.removeByUmpireId).not.toHaveBeenCalled();
+    expect(rotation.rotate).not.toHaveBeenCalled();
     expect(waitingUmpire.add).not.toHaveBeenCalled();
+  });
+
+  it('rotates a lone umpire without confirmation when service judges are disabled', async () => {
+    settings.update((value) => ({ ...value, withServiceJudge: false }));
+    courtUmpires.set([{ id: 1, umpireId: 3, courtNo: 2 }]);
+    await component.showRemoveConfirmation(2);
+    expect(rotation.rotate).toHaveBeenCalledOnceWith(2, 3, undefined);
   });
 
   it('derives rest from all four duty states and reacts to assignment changes', () => {

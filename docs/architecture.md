@@ -33,7 +33,23 @@ Pages are standalone Angular components and directly import the Ionic standalone
 
 Persistence services use Dexie's `liveQuery()` and Angular's `toSignal()` to expose reactive data. Pages derive lookup maps, ID sets, filtered lists, and other display state with `computed()`.
 
-`Tab1Page` currently coordinates multi-service operations such as moving officials between waiting queues and courts. These operations span multiple Dexie tables but are not currently wrapped in database transactions.
+`CourtRotationService` coordinates drag-and-drop moves, court assignments, and
+rotations inside Dexie transactions. It rechecks current persisted state before
+writing, so repeated actions or stale confirmations cannot assign the same queue
+head twice. Confirmation actions also verify that the role configuration still
+matches the officials shown in the alert. Pages handle presentation and delegate
+the state changes to services.
+
+`SettingsService` validates positive integer court counts and atomically updates
+settings with assignment cleanup. `UmpireService` atomically deletes an official's
+duty records and closes queue gaps when deleting that official. Roster forms await
+persistence before dismissing their modal and keep the draft if saving fails.
+
+The Ionic 9 `@ionic/angular` entry point exports standalone components. Root and
+tab outlet hosts explicitly use eager change detection so plain-field form state
+continues to update under Angular 22. Translation and full-name pipes remain
+impure because their results also depend on the selected language, beyond their
+explicit pipe arguments.
 
 ## Persistence model
 
@@ -137,5 +153,4 @@ Operations that move an official between states should preserve exclusivity even
 
 ## Known architectural questions
 
-- Should moves spanning multiple tables use Dexie transactions to prevent partial updates?
 - Should domain entities and database setup remain in root-level `db.ts`, or move under `src/app/`?

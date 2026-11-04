@@ -26,7 +26,7 @@ export class AppComponent {
   readonly themeService = inject(ThemeService);
 
   constructor() {
-    this.checkForUpdates();
+    void this.checkForUpdates();
   }
 
   private async checkForUpdates(): Promise<void> {
@@ -34,12 +34,9 @@ export class AppComponent {
       return;
     }
 
-    // Snap handles updates on Linux.
-    if (platform() === 'linux') {
-      return;
-    }
-
     try {
+      // Snap handles updates on Linux.
+      if (platform() === 'linux') return;
       const update = await check();
 
       if (update) {

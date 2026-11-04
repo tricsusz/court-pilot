@@ -18,4 +18,6 @@ bootstrapApplication(AppComponent, {
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules))
   ]
-});
+}).catch((error: unknown) =>
+  console.error('Application bootstrap failed:', error)
+);

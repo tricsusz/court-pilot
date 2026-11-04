@@ -1,6 +1,3 @@
-import { language, male, settings } from 'ionicons/icons';
-import { noop } from 'rxjs';
-
 export const translations = {
   en: {
     courts: 'Courts',
@@ -27,6 +24,7 @@ export const translations = {
     newCourtOfficial: 'New Court Official',
     cancel: 'Cancel',
     save: 'Save',
+    saveFailed: 'Could not save the court official. Please try again.',
     firstName: 'First Name',
     lastName: 'Last Name',
     country: 'Country',
@@ -88,6 +86,7 @@ export const translations = {
     newCourtOfficial: 'Új Tisztségviselő',
     cancel: 'Mégse',
     save: 'Mentés',
+    saveFailed: 'Nem sikerült menteni a tisztségviselőt. Próbáld újra.',
     firstName: 'Keresztnév',
     lastName: 'Vezetéknév',
     country: 'Ország',

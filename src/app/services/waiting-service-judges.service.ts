@@ -22,31 +22,26 @@ export class WaitingServiceJudgesService {
    * Add new umpire to queue with max(order) + 1
    */
   async add(serviceJudgeId: number, toPosition?: number): Promise<number> {
-    const id = await db.transaction('rw', db.waitingServiceJudges, async () => {
+    return db.transaction('rw', db.waitingServiceJudges, async () => {
       const last = await db.waitingServiceJudges.orderBy('order').last();
-
-      const nextOrder = last ? last.order + 1 : 1;
-
-      return db.waitingServiceJudges.add({
+      const id = await db.waitingServiceJudges.add({
         serviceJudgeId,
-        order: nextOrder
+        order: last ? last.order + 1 : 1
       });
+      if (toPosition !== undefined)
+        await this.moveToPosition(serviceJudgeId, toPosition);
+      return id;
     });
-
-    if (toPosition !== undefined) {
-      await this.moveToPosition(serviceJudgeId, toPosition);
-    }
-
-    return id;
   }
 
   /**
    * Remove from queue
    */
   async remove(id: number): Promise<void> {
-    await db.waitingServiceJudges.delete(id);
-
-    await this.reinitOrders();
+    await db.transaction('rw', db.waitingServiceJudges, async () => {
+      await db.waitingServiceJudges.delete(id);
+      await this.reinitOrders();
+    });
   }
 
   async removeByUmpireId(umpireId: number): Promise<void> {
@@ -106,7 +101,7 @@ export class WaitingServiceJudgesService {
           .toArray();
 
         for (const item of affected) {
-          await db.waitingServiceJudges.update(item.id!, {
+          await db.waitingServiceJudges.update(item.id, {
             order: item.order + 1
           });
         }
@@ -123,13 +118,13 @@ export class WaitingServiceJudgesService {
           .toArray();
 
         for (const item of affected) {
-          await db.waitingServiceJudges.update(item.id!, {
+          await db.waitingServiceJudges.update(item.id, {
             order: item.order - 1
           });
         }
       }
 
-      await db.waitingServiceJudges.update(current.id!, {
+      await db.waitingServiceJudges.update(current.id, {
         order: newOrder
       });
     });
@@ -145,7 +140,7 @@ export class WaitingServiceJudgesService {
         const expectedOrder = i + 1;
 
         if (item.order !== expectedOrder) {
-          await db.waitingServiceJudges.update(item.id!, {
+          await db.waitingServiceJudges.update(item.id, {
             order: expectedOrder
           });
         }
@@ -154,7 +149,7 @@ export class WaitingServiceJudgesService {
   }
 
   async getCurrentUmpire(): Promise<Umpire | undefined> {
-    const item = await db.waitingServiceJudges.where('order').equals(1).first();
+    const item = await db.waitingServiceJudges.orderBy('order').first();
 
     return item ? db.umpires.get(item.serviceJudgeId) : undefined;
   }

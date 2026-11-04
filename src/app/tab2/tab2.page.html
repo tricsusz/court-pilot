@@ -1,8 +1,8 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title> {{ 'courtOfficials' | translate }} </ion-title>
-    <ion-buttons [slot]="'end'">
-      <ion-button [color]="'primary'" [fill]="'solid'" id="open-modal">
+    <ion-buttons slot="end">
+      <ion-button color="primary" fill="solid" (click)="modal.present()">
         <ion-icon slot="start" name="add"></ion-icon>
         {{ 'add' | translate }}
       </ion-button>
@@ -13,7 +13,7 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Játékvezetők</ion-title>
+      <ion-title size="large">{{ 'courtOfficials' | translate }}</ion-title>
     </ion-toolbar>
   </ion-header>
 
@@ -25,8 +25,9 @@
           <ion-item>
             <ion-label> {{ umpire | fullname }} </ion-label>
             <ion-button
-              [color]="'danger'"
+              color="danger"
               slot="end"
+              [attr.aria-label]="('confirmDeleteUmpire' | translate) + ': ' + (umpire | fullname)"
               (click)="showDeleteConfirmation(umpire)">
               <ion-icon slot="icon-only" name="trash"></ion-icon>
             </ion-button>
@@ -39,19 +40,19 @@
     </ion-row>
   </ion-grid>
 
-  <ion-modal trigger="open-modal" (willDismiss)="onWillDismiss($event)">
+  <ion-modal [canDismiss]="!saving">
     <ng-template>
       <ion-header>
         <ion-toolbar>
           <ion-buttons slot="start">
-            <ion-button (click)="cancel()"
+            <ion-button [disabled]="saving" (click)="cancel()"
               >{{ 'cancel' | translate }}</ion-button
             >
           </ion-buttons>
           <ion-title>{{ 'newCourtOfficial' | translate }}</ion-title>
           <ion-buttons slot="end">
             <ion-button
-              [disabled]="!isValidUmpire()"
+              [disabled]="saving || !isValidUmpire()"
               (click)="confirm()"
               [strong]="true">
               {{ 'save' | translate }}
