@@ -276,3 +276,18 @@ Do not manually edit or commit generated/dependency content unless a workflow ex
 - `src-tauri/target/`
 - `src-tauri/gen/`
 - generated `snap-root/`
+
+## Sample roster preview
+
+With the development server running, open `/tabs/pilot?demo=1` to add 20 sample
+officials to this browser's local database. Existing officials and settings are
+preserved. The sample contains eight waiting umpires, six waiting service judges,
+and six resting officials. With service judges disabled, fourteen officials wait
+as umpires and six rest. Reopening the URL does not duplicate the sample roster.
+The sample officials have last names `Demo 01` through `Demo 20` and can be removed
+from the roster page. Production builds ignore the query parameter.
+
+The Pilot sidebar initially divides its available height equally between the two
+or three lists. Drag the dividers vertically, or focus them and use the Up/Down
+arrow keys, to resize adjacent lists. Sizes stay proportional when the window
+resizes and reset when service-judge mode changes or the page reloads.

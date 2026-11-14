@@ -1,4 +1,120 @@
-.bottom-lists ion-list {
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.pilot-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 1fr);
+  gap: 32px;
+  height: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.courts {
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  align-self: stretch;
+}
+
+.courts--umpire-only {
+  ion-row {
+    justify-content: center;
+  }
+
+  .court-umpire {
+    // Half of the nine grid columns left by the court number and actions.
+    flex: 0 0 37.5%;
+    max-width: 37.5%;
+  }
+
+  @media (min-width: 992px) {
+    .court-umpire {
+      // Large screens leave ten grid columns for the umpire.
+      flex-basis: calc(100% * 5 / 12);
+      max-width: calc(100% * 5 / 12);
+    }
+  }
+}
+
+.official-lists {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.queue-resizer {
+  flex: 0 0 16px;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: row-resize;
+  touch-action: none;
+
+  &::after {
+    content: '';
+    width: 40px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--ion-color-medium);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-primary);
+  }
+}
+
+.official-queue {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: min(64px, 25%);
+  overflow: hidden;
+
+  &.has-more-below::after {
+    content: '';
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233880ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 6 6 6 6-6M6 12l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    right: 12px;
+    bottom: 4px;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--ion-background-color);
+    color: var(--ion-text-color);
+    box-shadow: 0 1px 5px rgb(0 0 0 / 25%);
+    font-size: 26px;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  > ion-item {
+    flex-shrink: 0;
+  }
+
+  > ion-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+}
+
+.courts ion-list {
   min-height: 64px;
 }
 

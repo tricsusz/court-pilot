@@ -38,6 +38,8 @@ import { CourtUmpireService } from '../services/court.umpire.service';
 import { CourtServiceJudgeService } from '../services/court.service.judge.service';
 import { addIcons } from 'ionicons';
 import { enterOutline, exitOutline } from 'ionicons/icons';
+import { QueueResizeDirective } from './queue-resize.directive';
+import { ScrollHintDirective } from './scroll-hint.directive';
 import { TranslatePipe } from '../i18n/translation.pipe';
 import { TranslationService } from '../i18n/translation.service';
 
@@ -65,7 +67,9 @@ import { TranslationService } from '../i18n/translation.service';
     CdkDrag,
     CdkDragPlaceholder,
     CdkDropListGroup,
-    TranslatePipe
+    TranslatePipe,
+    ScrollHintDirective,
+    QueueResizeDirective
   ]
 })
 export class Tab1Page {
