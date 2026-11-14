@@ -63,6 +63,12 @@ export class Tab3Page {
     });
   }
 
+  async updateStartingCourtNumber(event: InputCustomEvent): Promise<void> {
+    await this.settingsService.update({
+      startingCourtNumber: Number(event.detail.value)
+    });
+  }
+
   async updateWithServiceJudge(event: ToggleCustomEvent): Promise<void> {
     await this.settingsService.update({
       withServiceJudge: event.detail.checked

@@ -68,8 +68,8 @@ export class CourtRotationService {
       if (
         !settings ||
         !Number.isInteger(courtNo) ||
-        courtNo < 1 ||
-        courtNo > settings.numberOfCourts ||
+        courtNo < settings.startingCourtNumber ||
+        courtNo >= settings.startingCourtNumber + settings.numberOfCourts ||
         (role === 'serviceJudge' && !settings.withServiceJudge) ||
         !(await db.umpires.get(id))
       )
@@ -92,8 +92,8 @@ export class CourtRotationService {
         !settings ||
         settings.withServiceJudge !== (expectedJudgeId !== undefined) ||
         !Number.isInteger(courtNo) ||
-        courtNo < 1 ||
-        courtNo > settings.numberOfCourts
+        courtNo < settings.startingCourtNumber ||
+        courtNo >= settings.startingCourtNumber + settings.numberOfCourts
       )
         return;
       if (

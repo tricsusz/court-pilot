@@ -21,11 +21,11 @@ flowchart TD
 
 The root route lazy-loads the tab routes. The three primary routes are:
 
-| Route            | Source          | Responsibility                                                         |
-| ---------------- | --------------- | ---------------------------------------------------------------------- |
-| `/tabs/pilot`    | `src/app/tab1/` | Waiting queues, court assignments, drag and drop, and rotation actions |
-| `/tabs/umpires`  | `src/app/tab2/` | Court-official roster management                                       |
-| `/tabs/settings` | `src/app/tab3/` | Court count, theme, service-judge mode, alerts, and language           |
+| Route            | Source          | Responsibility                                                                   |
+| ---------------- | --------------- | -------------------------------------------------------------------------------- |
+| `/tabs/pilot`    | `src/app/tab1/` | Waiting queues, court assignments, drag and drop, and rotation actions           |
+| `/tabs/umpires`  | `src/app/tab2/` | Court-official roster management                                                 |
+| `/tabs/settings` | `src/app/tab3/` | Court count and starting number, theme, service-judge mode, alerts, and language |
 
 Pages are standalone Angular components and directly import the Ionic standalone components they use. Services are root-provided and injected with Angular's `inject()` function.
 
@@ -40,7 +40,7 @@ head twice. Confirmation actions also verify that the role configuration still
 matches the officials shown in the alert. Pages handle presentation and delegate
 the state changes to services.
 
-`SettingsService` validates positive integer court counts and atomically updates
+`SettingsService` validates positive integer court counts and starting court numbers and atomically updates
 settings with assignment cleanup. `UmpireService` atomically deletes an official's
 duty records and closes queue gaps when deleting that official. Roster forms await
 persistence before dismissing their modal and keep the draft if saving fails.
@@ -53,7 +53,7 @@ explicit pipe arguments.
 
 ## Persistence model
 
-`db.ts` declares a `CourtPilot` Dexie database at schema version 2.
+`db.ts` declares a `CourtPilot` Dexie database at schema version 3.
 
 ```mermaid
 erDiagram
@@ -92,7 +92,7 @@ erDiagram
     }
 ```
 
-Settings use a singleton row with ID `1`. Defaults are five courts, service judges enabled, and confirmation alerts enabled.
+Settings use a singleton row with ID `1`. Defaults are five courts starting at 1, service judges enabled, and confirmation alerts enabled.
 
 Theme preference is stored separately in `localStorage` under `theme`, using
 `light`, `dark`, or `system`. Device-preferred (`system`) is the default when no
@@ -115,6 +115,21 @@ false for existing settings rows. Existing officials need no transformation;
 officials without return metadata have no return action. Queue indexes and
 existing records are preserved. Older application versions do not understand the
 new metadata; downgrading an IndexedDB database is not supported.
+
+### Court numbering
+
+`startingCourtNumber` defaults to 1. The configured count is unchanged by the
+starting number: six courts starting at 5 are numbered 5 through 10. Assignment
+and drag-and-drop validation use this same inclusive range. Changing either
+setting removes assignments outside the new range, leaving those officials off
+duty. Assignments within the range keep their court numbers.
+
+Schema version 3 sets `startingCourtNumber` to 1 on existing settings records.
+Other settings, officials, assignments, and queue ordering are preserved. New
+installations use the same default. Invalid starting numbers (non-positive or
+non-integer values) and ranges exceeding safe integers are rejected without
+changing settings or duty. As with earlier migrations, database downgrades are
+not supported.
 
 ### Schema-change policy
 

@@ -70,6 +70,17 @@
             </ion-input>
           </ion-item>
           <ion-item>
+            <ion-input
+              [label]="'startingCourtNumber' | translate"
+              type="number"
+              min="1"
+              labelPlacement="floating"
+              [value]="currentSettings.startingCourtNumber"
+              step="1"
+              (ionChange)="updateStartingCourtNumber($event)">
+            </ion-input>
+          </ion-item>
+          <ion-item>
             <ion-select
               [label]="'theme' | translate"
               [value]="themeService.theme()"

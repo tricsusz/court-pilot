@@ -40,6 +40,7 @@ export interface Settings {
   id: number;
   withServiceJudge: boolean;
   numberOfCourts: number;
+  startingCourtNumber: number;
   showAlert: boolean;
   waitingListQuickButtons?: boolean;
 }
@@ -76,6 +77,22 @@ db.version(2)
       .table('settings')
       .toCollection()
       .modify({ waitingListQuickButtons: false });
+  });
+
+db.version(3)
+  .stores({
+    umpires: '++id, lastName',
+    courtUmpires: '++id, courtNo, umpireId',
+    courtServiceJudges: '++id, courtNo, umpireId',
+    settings: '++id',
+    waitingUmpires: '++id, order, umpireId',
+    waitingServiceJudges: '++id, order, serviceJudgeId'
+  })
+  .upgrade(async (transaction) => {
+    await transaction
+      .table('settings')
+      .toCollection()
+      .modify({ startingCourtNumber: 1 });
   });
 
 export { db };

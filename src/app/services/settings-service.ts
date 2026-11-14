@@ -23,12 +23,10 @@ export class SettingsService {
    * Update settings
    */
   async update(changes: Partial<Omit<Settings, 'id'>>): Promise<void> {
-    if (
-      changes.numberOfCourts !== undefined &&
-      (!Number.isSafeInteger(changes.numberOfCourts) ||
-        changes.numberOfCourts < 1)
-    )
-      return;
+    for (const value of [changes.numberOfCourts, changes.startingCourtNumber]) {
+      if (value !== undefined && (!Number.isSafeInteger(value) || value < 1))
+        return;
+    }
 
     await db.transaction(
       'rw',
@@ -42,15 +40,19 @@ export class SettingsService {
         await this.ensureSettings();
         const current = (await db.settings.get(1))!;
         const next = { ...current, ...changes };
+        const lastCourt = next.startingCourtNumber + (next.numberOfCourts - 1);
+        if (!Number.isSafeInteger(lastCourt)) return;
         if (!next.withServiceJudge) next.waitingListQuickButtons = false;
         await db.courtUmpires
           .where('courtNo')
-          .above(next.numberOfCourts)
+          .below(next.startingCourtNumber)
           .delete();
+        await db.courtUmpires.where('courtNo').above(lastCourt).delete();
         await db.courtServiceJudges
           .where('courtNo')
-          .above(next.numberOfCourts)
+          .below(next.startingCourtNumber)
           .delete();
+        await db.courtServiceJudges.where('courtNo').above(lastCourt).delete();
         if (!next.withServiceJudge) {
           await db.courtServiceJudges.clear();
           await db.waitingServiceJudges.clear();
@@ -66,6 +68,7 @@ export class SettingsService {
       await db.settings.put({
         id: 1,
         numberOfCourts: 5,
+        startingCourtNumber: 1,
         withServiceJudge: true,
         showAlert: true,
         waitingListQuickButtons: false

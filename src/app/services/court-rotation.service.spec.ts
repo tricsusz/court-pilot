@@ -20,6 +20,7 @@ describe('CourtRotationService', () => {
     await db.settings.put({
       id: 1,
       numberOfCourts: 3,
+      startingCourtNumber: 1,
       withServiceJudge: true,
       showAlert: false
     });
@@ -148,4 +149,39 @@ describe('CourtRotationService', () => {
     expect(await db.courtUmpires.count()).toBe(1);
     expect(await db.courtServiceJudges.count()).toBe(0);
   });
+
+  for (const courtNo of [4, 5, 10, 11]) {
+    it(`validates direct placement on court ${courtNo} against the offset range`, async () => {
+      await db.settings.update(1, {
+        startingCourtNumber: 5,
+        numberOfCourts: 6
+      });
+      await db.waitingUmpires.add({ umpireId: 1, order: 1 });
+      await service.moveToCourt(1, 'umpire', courtNo);
+      const valid = courtNo >= 5 && courtNo <= 10;
+      expect(await db.courtUmpires.count()).toBe(valid ? 1 : 0);
+      expect(await db.waitingUmpires.count()).toBe(valid ? 0 : 1);
+    });
+
+    it(`validates queue assignment on court ${courtNo} against the offset range`, async () => {
+      await db.settings.update(1, {
+        startingCourtNumber: 5,
+        numberOfCourts: 6
+      });
+      await db.waitingUmpires.add({ umpireId: 1, order: 1 });
+      await db.waitingServiceJudges.add({ serviceJudgeId: 2, order: 1 });
+      await service.assignNext(courtNo, 1, 2);
+      const valid = courtNo >= 5 && courtNo <= 10;
+      expect(await db.courtUmpires.count()).toBe(valid ? 1 : 0);
+      expect(await db.courtServiceJudges.count()).toBe(valid ? 1 : 0);
+      if (valid) {
+        await service.rotate(courtNo, 1, 2);
+        expect(await db.courtUmpires.count()).toBe(0);
+        expect((await db.waitingUmpires.toArray())[0].umpireId).toBe(2);
+        expect(
+          (await db.waitingServiceJudges.toArray())[0].serviceJudgeId
+        ).toBe(1);
+      }
+    });
+  }
 });

@@ -18,7 +18,9 @@ An optional second role on a court. Service-judge behavior can be enabled or dis
 
 ### Court
 
-A numbered play area. Courts are generated from `1` through the configured `numberOfCourts`; the default is five.
+A numbered play area. Courts are generated from `startingCourtNumber` through
+`startingCourtNumber + numberOfCourts - 1`. Defaults are five courts starting at 1;
+six courts starting at 5 are numbered 5 through 10.
 
 ### Waiting queue
 
@@ -43,11 +45,12 @@ Remove assigned officials from a court and return them to waiting duty. With ser
 - An official must never occupy multiple queues or assignments at the same time.
 - Queue assignment is FIFO by numeric `order`; the lowest value is next.
 - Removing a court assignment with service judges enabled swaps the officials' role queues.
-- Reducing `numberOfCourts` removes assignments above the new court count. Those officials become not on duty; they are not automatically added to a waiting queue.
+- Changing `startingCourtNumber` or `numberOfCourts` removes assignments outside the new court range. Assignments within the range retain their court numbers. Those officials become not on duty; they are not automatically added to a waiting queue.
 
 ## Current settings
 
 - `numberOfCourts` — number of numbered courts shown
+- `startingCourtNumber` — first court number, a positive integer defaulting to 1
 - `withServiceJudge` — whether service-judge assignments are active
 - `showAlert` — whether quick court actions require confirmation
 - language — stored separately in local storage; currently English or Hungarian

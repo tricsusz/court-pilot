@@ -281,7 +281,8 @@ export class Tab1Page {
   readonly courtIndexes = computed(() => {
     const count = this.settings()?.numberOfCourts ?? 0;
 
-    return Array.from({ length: count }, (_, i) => i + 1);
+    const start = this.settings()?.startingCourtNumber ?? 1;
+    return Array.from({ length: count }, (_, i) => start + i);
   });
 
   /**

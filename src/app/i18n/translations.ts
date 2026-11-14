@@ -2,6 +2,7 @@ export const translations = {
   en: {
     courts: 'Courts',
     numberOfCourts: 'Number of Courts',
+    startingCourtNumber: 'Starting Court Number',
     theme: 'Theme',
     themeLight: 'Light',
     themeDark: 'Dark',
@@ -64,6 +65,7 @@ export const translations = {
   hu: {
     courts: 'Pályák',
     numberOfCourts: 'Pályák száma',
+    startingCourtNumber: 'Kezdő pályaszám',
     theme: 'Téma',
     themeLight: 'Világos',
     themeDark: 'Sötét',

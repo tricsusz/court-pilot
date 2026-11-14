@@ -18,7 +18,8 @@ describe('WaitingDutyService', () => {
       withServiceJudge: true,
       waitingListQuickButtons: true,
       showAlert: false,
-      numberOfCourts: 5
+      numberOfCourts: 5,
+      startingCourtNumber: 1
     });
     await db.umpires.put({
       id: 1,

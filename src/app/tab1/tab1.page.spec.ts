@@ -27,6 +27,7 @@ describe('Tab1Page court rotation', () => {
   const settings = signal<Settings>({
     id: 1,
     numberOfCourts: 3,
+    startingCourtNumber: 1,
     withServiceJudge: true,
     showAlert: false
   });
@@ -45,6 +46,7 @@ describe('Tab1Page court rotation', () => {
     settings.set({
       id: 1,
       numberOfCourts: 3,
+      startingCourtNumber: 1,
       withServiceJudge: true,
       showAlert: false
     });
@@ -304,9 +306,21 @@ describe('Tab1Page court rotation', () => {
     settings.update((value) => ({
       ...value,
       numberOfCourts: 1,
+      startingCourtNumber: 1,
       withServiceJudge: false
     }));
     expect(component.courtIndexes()).toEqual([1]);
     expect(component.serviceJudgeEnabled()).toBeFalse();
+  });
+
+  it('shows exactly six courts starting at five and reacts to renumbering', () => {
+    settings.update((value) => ({
+      ...value,
+      startingCourtNumber: 5,
+      numberOfCourts: 6
+    }));
+    expect(component.courtIndexes()).toEqual([5, 6, 7, 8, 9, 10]);
+    settings.update((value) => ({ ...value, startingCourtNumber: 1 }));
+    expect(component.courtIndexes()).toEqual([1, 2, 3, 4, 5, 6]);
   });
 });
