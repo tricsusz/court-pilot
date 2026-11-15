@@ -38,3 +38,26 @@ ion-alert.wide {
   --backdrop-opacity: 0.8;
   --min-width: min(400px, calc(100vw - 32px));
 }
+
+// Keep palette overrides global to avoid expanding Angular host-context selectors.
+html:not(.ion-palette-dark) app-tab1 {
+  :is(ion-list[cdkDropList], .court-actions ion-list) {
+    background-color: var(--ion-color-light);
+  }
+
+  :is(
+    ion-list[cdkDropList].cdk-drop-list-dragging,
+    .custom-ion-item.primary,
+    .court-number ion-list
+  ) {
+    background-color: var(--ion-color-step-150, #d9d9d9);
+  }
+
+  .court-actions ion-item {
+    --background: var(--ion-color-light);
+  }
+
+  :is(.court-headers, .court-number) ion-item {
+    --background: var(--ion-color-step-150, #d9d9d9);
+  }
+}
